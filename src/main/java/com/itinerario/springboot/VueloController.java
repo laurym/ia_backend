@@ -4,25 +4,26 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.itinerarios.entity.Greeting;
+import com.itinerarios.entity.Vuelo;
 
 @RestController
-@RequestMapping("rest")
-public class GreetingController {
-
+@RequestMapping("rest/vuelos")
+public class VueloController {
+	Logger LOG = LogManager.getLogger(VueloController.class);
 	private static final String template = "Hello, %s!";
 	private final AtomicLong counter = new AtomicLong();
-	Logger LOG = LogManager.getLogger(GreetingController.class);
-
-	@GetMapping("/greeting")
-	public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
+	
+	@PostMapping(
+			  value = "/crearVuelos", consumes = "application/json", produces = "application/json")
+	public Greeting crearVuelo(@RequestBody Vuelo vuelo) {
 		LOG.info("***** Inicio  greeting *****");
 		LOG.info("***** Fin  greeting *****");
-		return new Greeting(counter.incrementAndGet(), String.format(template, name));
+		return new Greeting(counter.incrementAndGet(), String.format(template, vuelo));
 	}
 }
