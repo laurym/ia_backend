@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.itinerarios.dto.VueloDTO;
 import com.itinerarios.entity.Greeting;
-import com.itinerarios.entity.Vuelo;
 
 @RestController
 @RequestMapping("rest/vuelos")
@@ -21,7 +21,7 @@ public class VueloController {
 	
 	@PostMapping(
 			  value = "/crearVuelos", consumes = "application/json", produces = "application/json")
-	public Greeting crearVuelo(@RequestBody Vuelo vuelo) {
+	public Greeting crearVuelo(@RequestBody VueloDTO vuelo) {
 		LOG.info("***** Inicio  greeting *****");
 		LOG.info("***** Fin  greeting *****");
 		return new Greeting(counter.incrementAndGet(), String.format(template, vuelo));
