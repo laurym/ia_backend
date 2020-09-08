@@ -1,21 +1,25 @@
-package com.itinerario.springboot;
+package com.itinerarios.springboot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.itinerarios.dto.AerolineaDTO;
 import com.itinerarios.dto.AeropuertoDTO;
+import com.itinerarios.entity.Aerolinea;
 import com.itinerarios.entity.Greeting;
 import com.itinerarios.enums.TipoClase;
+import com.itinerarios.springboot.repository.AerolineaRepository;
 
 @RestController
 @RequestMapping("rest")
@@ -24,6 +28,9 @@ public class BaseController {
 	private static final String template = "Hello, %s!";
 	private final AtomicLong counter = new AtomicLong();
 	Logger LOG = LogManager.getLogger(BaseController.class);
+	
+	@Autowired 
+	private AerolineaRepository aerolineaRepository; 
 
 	@GetMapping("/greeting")
 	public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
@@ -46,15 +53,34 @@ public class BaseController {
 	
 	
 	@GetMapping("/aerolineas")
-	public AerolineaDTO obtenerAerolineas() {
+	public @ResponseBody List<AerolineaDTO> obtenerAerolineas() {
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
-		LOG.info("***** Fin  obtenerAeropuertos *****");
-		AerolineaDTO aerolineaDTO = new AerolineaDTO ();
-		aerolineaDTO.setCodigoAerolinea("AR");
-		aerolineaDTO.setNombreAerolinea("Aerolineas Argentinas");
-		aerolineaDTO.setPorcentajeDescuentoMenores(50L);
+//		AerolineaDTO aerolineaDTO = new AerolineaDTO ();
+//		aerolineaDTO.setCodigoAerolinea("AR");
+//		aerolineaDTO.setNombreAerolinea("Aerolineas Argentinas");
+//		aerolineaDTO.setPorcentajeDescuentoMenores(50L);
+//		return aerolineaDTO;
 		
-		return aerolineaDTO;
+	    // This returns a JSON or XML with the users
+			Iterable<Aerolinea> itAerolinea = aerolineaRepository.findAll();
+			Iterator<Aerolinea> itObjs = itAerolinea.iterator();
+			
+//			for (Aerolinea idx : itAerolinea.)
+			List<AerolineaDTO> listDTO = new ArrayList<AerolineaDTO>();
+			
+			while (itObjs.hasNext()) {
+				Aerolinea aerolinea = itObjs.next();
+				AerolineaDTO dto = new AerolineaDTO();
+				dto.setId(aerolinea.getId());
+				dto.setCodigoAerolinea(aerolinea.getCodigoAerolinea());
+				dto.setNombreAerolinea(aerolinea.getNombreAerolinea());
+				dto.setPorcentajeDescuentoMenores(aerolinea.getPorcentajeDescuentoMenores());
+				
+				listDTO.add(dto);
+			}
+			
+			LOG.info("***** Fin  obtenerAeropuertos *****");
+		    return listDTO;
 	}
 	
 	@GetMapping("/clases")

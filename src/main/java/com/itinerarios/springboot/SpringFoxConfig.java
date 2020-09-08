@@ -1,4 +1,4 @@
-package com.itinerario.springboot;
+package com.itinerarios.springboot;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

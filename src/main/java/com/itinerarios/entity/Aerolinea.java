@@ -1,16 +1,34 @@
 package com.itinerarios.entity;
 
-public class Aerolinea {
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity 
+//@Table(name="aerolinea")
+public class Aerolinea{// implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	// AEROLINEAS (GET)
 //		{
 //			"nombreAerolinea"
 //			"codigoAerolinea"
 //			"porcentajeDescuentoMenores" // (POR AHORA A NIVEL AEROLINEA)
 //		}
-
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
+	
 	private String nombreAerolinea;
+	
 	private String codigoAerolinea;
+	
 	private Long porcentajeDescuentoMenores;
 
 	public Long getId() {

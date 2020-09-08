@@ -1,4 +1,4 @@
-package com.itinerario.springboot;
+package com.itinerarios.springboot;
 
 import java.util.concurrent.atomic.AtomicLong;
 
