@@ -8,10 +8,15 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.itinerarios.dto.AerolineaDTO;
@@ -20,6 +25,9 @@ import com.itinerarios.entity.Aerolinea;
 import com.itinerarios.entity.Greeting;
 import com.itinerarios.enums.TipoClase;
 import com.itinerarios.springboot.repository.AerolineaRepository;
+import com.itinerarios.springboot.utils.DTOUtils;
+
+
 
 @RestController
 @RequestMapping("rest")
@@ -55,17 +63,10 @@ public class BaseController {
 	@GetMapping("/aerolineas")
 	public @ResponseBody List<AerolineaDTO> obtenerAerolineas() {
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
-//		AerolineaDTO aerolineaDTO = new AerolineaDTO ();
-//		aerolineaDTO.setCodigoAerolinea("AR");
-//		aerolineaDTO.setNombreAerolinea("Aerolineas Argentinas");
-//		aerolineaDTO.setPorcentajeDescuentoMenores(50L);
-//		return aerolineaDTO;
-		
 	    // This returns a JSON or XML with the users
 			Iterable<Aerolinea> itAerolinea = aerolineaRepository.findAll();
 			Iterator<Aerolinea> itObjs = itAerolinea.iterator();
 			
-//			for (Aerolinea idx : itAerolinea.)
 			List<AerolineaDTO> listDTO = new ArrayList<AerolineaDTO>();
 			
 			while (itObjs.hasNext()) {
@@ -81,6 +82,20 @@ public class BaseController {
 			
 			LOG.info("***** Fin  obtenerAeropuertos *****");
 		    return listDTO;
+	}
+	
+	@PostMapping(value = "/aerolineas", consumes = "application/json", produces = "application/json")
+	@ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+	public AerolineaDTO guardarAerolineas(@RequestBody AerolineaDTO aerolineaDTO) {
+		LOG.info("***** Inicio  obtenerAeropuertos *****");
+		// user here is a prepopulated User instance
+		Aerolinea entity = DTOUtils.convertToEntity(aerolineaDTO);
+	    // This returns a JSON or XML with the users
+			entity = aerolineaRepository.save(entity);
+			
+			LOG.info("***** Fin  obtenerAeropuertos *****");
+		    return DTOUtils.convertToDto(entity);
 	}
 	
 	@GetMapping("/clases")
