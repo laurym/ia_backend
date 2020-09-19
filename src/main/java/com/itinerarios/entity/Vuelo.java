@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -33,19 +34,19 @@ public class Vuelo {
 	private Date horaPartida;
 	private Long duracion;
 	
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne
     @JoinColumn(name = "aeropuerto", referencedColumnName = "id", nullable = false)
 	private Aeropuerto aeropuerto;
 
 	
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne
     @JoinColumn(name = "aeropuertoDestino", referencedColumnName = "id", nullable = false)
 	private Aeropuerto aeropuertoDestino;
 	private Long asientosDisponibles;
 	private Boolean disponible;
 
 	@Transient
-//	@OneToMany(fetch=FetchType.LAZY)
+//	@OneToMany
 	private List<ClaseVuelo> clases;
 
 	public String getCodigo() {
