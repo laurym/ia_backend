@@ -18,10 +18,10 @@ public class VueloDTO {
 	private Date fechaPartida;
 	private Date horaPartida;
 	private Long duracion;
-	private String codigoAeropuerto;
-	private String codigoAeropuertoDestino;
-//	private AeropuertoDTO aeropuerto;
-//	private AeropuertoDTO aeropuertoDestino;
+//	private String codigoAeropuerto;
+//	private String codigoAeropuertoDestino;
+	private AeropuertoDTO aeropuerto;
+	private AeropuertoDTO aeropuertoDestino;
 	private Long asientosDisponibles;
 	private Boolean disponible;
 
@@ -59,37 +59,37 @@ public class VueloDTO {
 		this.duracion = duracion;
 	}
 
-	public String getCodigoAeropuerto() {
-		return codigoAeropuerto;
-	}
-
-	public void setCodigoAeropuerto(String codigoAeropuerto) {
-		this.codigoAeropuerto = codigoAeropuerto;
-	}
-
-	public String getCodigoAeropuertoDestino() {
-		return codigoAeropuertoDestino;
-	}
-
-	public void setCodigoAeropuertoDestino(String codigoAeropuertoDestino) {
-		this.codigoAeropuertoDestino = codigoAeropuertoDestino;
-	}
-
-//	public AeropuertoDTO getAeropuerto() {
-//		return aeropuerto;
+//	public String getCodigoAeropuerto() {
+//		return codigoAeropuerto;
 //	}
 //
-//	public void setAeropuerto(AeropuertoDTO aeropuerto) {
-//		this.aeropuerto = aeropuerto;
+//	public void setCodigoAeropuerto(String codigoAeropuerto) {
+//		this.codigoAeropuerto = codigoAeropuerto;
 //	}
 //
-//	public AeropuertoDTO getAeropuertoDestino() {
-//		return aeropuertoDestino;
+//	public String getCodigoAeropuertoDestino() {
+//		return codigoAeropuertoDestino;
 //	}
 //
-//	public void setAeropuertoDestino(AeropuertoDTO aeropuertoDestino) {
-//		this.aeropuertoDestino = aeropuertoDestino;
+//	public void setCodigoAeropuertoDestino(String codigoAeropuertoDestino) {
+//		this.codigoAeropuertoDestino = codigoAeropuertoDestino;
 //	}
+
+	public AeropuertoDTO getAeropuerto() {
+		return aeropuerto;
+	}
+
+	public void setAeropuerto(AeropuertoDTO aeropuerto) {
+		this.aeropuerto = aeropuerto;
+	}
+
+	public AeropuertoDTO getAeropuertoDestino() {
+		return aeropuertoDestino;
+	}
+
+	public void setAeropuertoDestino(AeropuertoDTO aeropuertoDestino) {
+		this.aeropuertoDestino = aeropuertoDestino;
+	}
 
 	public Long getAsientosDisponibles() {
 		return asientosDisponibles;

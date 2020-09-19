@@ -33,7 +33,7 @@ public class Vuelo {
 	private Date horaPartida;
 	private Long duracion;
 	
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "aeropuerto", referencedColumnName = "id", nullable = false)
 	private Aeropuerto aeropuerto;
 

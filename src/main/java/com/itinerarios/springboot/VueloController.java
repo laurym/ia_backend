@@ -33,14 +33,14 @@ public class VueloController {
 	
 	
 	@PostMapping(
-			  value = "/crearVuelos", consumes = "application/json", produces = "application/json")
+			  value = "/crearVuelo", consumes = "application/json", produces = "application/json")
 	public Greeting crearVuelo(@RequestBody VueloDTO vuelo) {
 		LOG.info("***** Inicio  greeting *****");
 		LOG.info("***** Fin  greeting *****");
 		return new Greeting(counter.incrementAndGet(), String.format(template, vuelo));
 	}
 	
-	@GetMapping("/vuelos")
+	@GetMapping("/busqueda")
 	public List<VueloDTO> obtenerVuelos(@RequestBody VueloReqForm vueloReqForm) {
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
 		Iterable<Vuelo> itObj = vueloRepository.findAll();
