@@ -1,5 +1,11 @@
 package com.itinerarios.entity;
 
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "clasePorVuelo")
 public class ClaseVuelo {
 //	 {
 //			"tipoClase" (Economica , Premium Economy ,Ejecutiva, Primera)
@@ -7,16 +13,17 @@ public class ClaseVuelo {
 //			"precioClase"
 //		  }
 
-	private String tipoClase;
+	@EmbeddedId
+	private ClaseVueloId id;
 	private Long asientosDisponibles;
 	private Double precioClase;
 
-	public String getTipoClase() {
-		return tipoClase;
+	public ClaseVueloId getId() {
+		return id;
 	}
 
-	public void setTipoClase(String tipoClase) {
-		this.tipoClase = tipoClase;
+	public void setId(ClaseVueloId id) {
+		this.id = id;
 	}
 
 	public Long getAsientosDisponibles() {

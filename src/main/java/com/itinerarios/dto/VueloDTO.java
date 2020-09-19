@@ -22,7 +22,7 @@ public class VueloDTO {
 	private String codigoAeropuertoDestino;
 //	private AeropuertoDTO aeropuerto;
 //	private AeropuertoDTO aeropuertoDestino;
-	private Long asientosDisponiblesTotales;
+	private Long asientosDisponibles;
 	private Boolean disponible;
 
 	private List<ClaseVueloDTO> clases;
@@ -91,12 +91,12 @@ public class VueloDTO {
 //		this.aeropuertoDestino = aeropuertoDestino;
 //	}
 
-	public Long getAsientosDisponiblesTotales() {
-		return asientosDisponiblesTotales;
+	public Long getAsientosDisponibles() {
+		return asientosDisponibles;
 	}
 
-	public void setAsientosDisponiblesTotales(Long asientosDisponiblesTotales) {
-		this.asientosDisponiblesTotales = asientosDisponiblesTotales;
+	public void setAsientosDisponibles(Long asientosDisponiblesTotales) {
+		this.asientosDisponibles = asientosDisponiblesTotales;
 	}
 
 	public Boolean getDisponible() {

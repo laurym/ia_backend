@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,10 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.itinerarios.dto.AerolineaDTO;
 import com.itinerarios.dto.AeropuertoDTO;
+import com.itinerarios.dto.TipoClaseDTO;
 import com.itinerarios.entity.Aerolinea;
+import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.Greeting;
-import com.itinerarios.enums.TipoClase;
+import com.itinerarios.entity.TipoClase;
 import com.itinerarios.springboot.repository.AerolineaRepository;
+import com.itinerarios.springboot.repository.AeropuertoRepository;
+import com.itinerarios.springboot.repository.TipoClaseRepository;
 import com.itinerarios.springboot.utils.DTOUtils;
 
 
@@ -39,7 +42,14 @@ public class BaseController {
 	
 	@Autowired 
 	private AerolineaRepository aerolineaRepository; 
-
+	
+	@Autowired 
+	private AeropuertoRepository aeropuertoRepository;
+	
+	@Autowired 
+	private TipoClaseRepository tipoClaseRepository;
+	
+//	@Autowired 
 	@GetMapping("/greeting")
 	public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
 		LOG.info("***** Inicio  greeting *****");
@@ -48,15 +58,21 @@ public class BaseController {
 	}
 	
 	@GetMapping("/aeropuertos")
-	public AeropuertoDTO obtenerAeropuertos() {
+	public List<AeropuertoDTO> obtenerAeropuertos() {
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
-		LOG.info("***** Fin  obtenerAeropuertos *****");
-		AeropuertoDTO aeropuertoDTO = new AeropuertoDTO ();
-		aeropuertoDTO.setAcronimo("AR");
-		aeropuertoDTO.setCiudad("Buenos Aires");
-		aeropuertoDTO.setPais("Argentina");
+		Iterable<Aeropuerto> itObj = aeropuertoRepository.findAll();
+		Iterator<Aeropuerto> itObjs = itObj.iterator();
 		
-		return aeropuertoDTO;
+		List<AeropuertoDTO> listDTO = new ArrayList<AeropuertoDTO>();
+		
+		while (itObjs.hasNext()) {
+			Aeropuerto aeropuerto = itObjs.next();
+			AeropuertoDTO dto = DTOUtils.convertToDto(aeropuerto);
+			listDTO.add(dto);
+		}
+		
+		LOG.info("***** Fin  obtenerAeropuertos *****");
+	    return listDTO;
 	}
 	
 	
@@ -71,12 +87,7 @@ public class BaseController {
 			
 			while (itObjs.hasNext()) {
 				Aerolinea aerolinea = itObjs.next();
-				AerolineaDTO dto = new AerolineaDTO();
-				dto.setId(aerolinea.getId());
-				dto.setCodigoAerolinea(aerolinea.getCodigoAerolinea());
-				dto.setNombreAerolinea(aerolinea.getNombreAerolinea());
-				dto.setPorcentajeDescuentoMenores(aerolinea.getPorcentajeDescuentoMenores());
-				
+				AerolineaDTO dto = DTOUtils.convertToDto(aerolinea);
 				listDTO.add(dto);
 			}
 			
@@ -99,15 +110,21 @@ public class BaseController {
 	}
 	
 	@GetMapping("/clases")
-	public List<TipoClase> obtenerClases(){ 
+	public List<TipoClaseDTO> obtenerClases(){ 
 		LOG.info("***** Inicio  obtenerClases *****");
-		LOG.info("***** Fin  obtenerClases *****");
-		List<TipoClase> listTipoClases = new ArrayList<TipoClase>();
+		Iterable<TipoClase> itObj = tipoClaseRepository.findAll();
+		Iterator<TipoClase> itObjs = itObj.iterator();
 		
-		for(TipoClase idx : TipoClase.values()) {
-			listTipoClases.add(idx);
+		List<TipoClaseDTO> listDTO = new ArrayList<TipoClaseDTO>();
+		
+		while (itObjs.hasNext()) {
+			TipoClase tipoClase = itObjs.next();
+			TipoClaseDTO dto = DTOUtils.convertToDto(tipoClase);
+			listDTO.add(dto);
 		}
-		return listTipoClases;
+		
+		LOG.info("***** Fin  obtenerClases *****");
+	    return listDTO;
 	}
 	
 //	// AEROPUERTOS  (GET)

@@ -12,8 +12,10 @@ public class AeropuertoDTO {
 	private Long id;
 	private String ciudad;
 	private String pais;
+	private String region;
 	private String acronimo;
-
+	private String nombre;
+	
 	public Long getId() {
 		return id;
 	}
@@ -38,12 +40,28 @@ public class AeropuertoDTO {
 		this.pais = pais;
 	}
 
+	public String getRegion() {
+		return region;
+	}
+
+	public void setRegion(String region) {
+		this.region = region;
+	}
+
 	public String getAcronimo() {
 		return acronimo;
 	}
 
 	public void setAcronimo(String acronimo) {
 		this.acronimo = acronimo;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 }
