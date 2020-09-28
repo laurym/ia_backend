@@ -1,21 +1,27 @@
 package com.itinerarios.request.form;
 
+import java.util.List;
 
-import java.util.Date;
+import com.itinerarios.dto.ClaseVueloDTO;
+import com.itinerarios.entity.RecurrenciaVuelo;
 
-import com.itinerarios.dto.TipoClaseDTO;
-
-public class VueloReqForm extends GeneralReqForm{
+public class VueloReqCrearForm extends GeneralReqForm {
 
 	private String fechaInicio;
-	private String fechaFin;
+	private String horaInicio;
+	private String duracion;
+
 	private String codigoAeropuertoOrigen;
 	private String codigoAeropuertoDestino;
+	
 	private Long cantidadPasajerosAdultos;
 	private Long cantidadPasajerosMenores;
-	
-	private TipoClaseDTO tipoClase;
 
+	private List<ClaseVueloDTO> clasesPorVueloList;
+	
+	
+	private RecurrenciaVuelo recurrencia;
+	
 	public String getFechaInicio() {
 		return fechaInicio;
 	}
@@ -24,12 +30,24 @@ public class VueloReqForm extends GeneralReqForm{
 		this.fechaInicio = fechaInicio;
 	}
 
-	public String getFechaFin() {
-		return fechaFin;
+	public String getHoraInicio() {
+		return horaInicio;
 	}
 
-	public void setFechaFin(String fechaFin) {
-		this.fechaFin = fechaFin;
+	public void setHoraInicio(String horaInicio) {
+		this.horaInicio = horaInicio;
+	}
+
+	public String getDuracion() {
+		return duracion;
+	}
+
+	/**
+	 * 
+	 * @param duracion debe estar expresado en horas de duracion
+	 */
+	public void setDuracion(String duracion) {
+		this.duracion = duracion;
 	}
 
 	public String getCodigoAeropuertoOrigen() {
@@ -64,11 +82,20 @@ public class VueloReqForm extends GeneralReqForm{
 		this.cantidadPasajerosMenores = cantidadPasajerosMenores;
 	}
 
-	public TipoClaseDTO getTipoClase() {
-		return tipoClase;
+	public List<ClaseVueloDTO> getClasesPorVueloList() {
+		return clasesPorVueloList;
 	}
 
-	public void setTipoClase(TipoClaseDTO tipoClase) {
-		this.tipoClase = tipoClase;
-	} 
+	public void setClasesPorVueloList(List<ClaseVueloDTO> clasesPorVueloList) {
+		this.clasesPorVueloList = clasesPorVueloList;
+	}
+
+	public RecurrenciaVuelo getRecurrencia() {
+		return recurrencia;
+	}
+
+	public void setRecurrencia(RecurrenciaVuelo recurrencia) {
+		this.recurrencia = recurrencia;
+	}
+
 }

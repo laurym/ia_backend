@@ -7,11 +7,8 @@ import com.itinerarios.dto.VueloDTO;
 public class VueloResponseForm {
 
 	private List<VueloDTO> listVuelos;
-	private List<String> mensaje;
+	private GeneralResponseForm mensaje;
 	
-	private String codigo;
-	private String mensajeResultado;
-
 	public List<VueloDTO> getListVuelos() {
 		return listVuelos;
 	}
@@ -20,14 +17,13 @@ public class VueloResponseForm {
 		this.listVuelos = listVuelos;
 	}
 
-	public List<String> getMensaje() {
+	public GeneralResponseForm getMensaje() {
 		return mensaje;
 	}
 
-	public void setMensaje(List<String> mensaje) {
+	public void setMensaje(GeneralResponseForm mensaje) {
 		this.mensaje = mensaje;
 	}
 
-	
 
 }
