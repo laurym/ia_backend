@@ -27,7 +27,7 @@ public class VueloDTO {
 	private Long asientosDisponibles;
 	private Boolean disponible;
 
-	@JsonIgnore
+//	@JsonIgnore
 	private Set<ClaseVueloDTO> clases;
 
 	public String getCodigo() {

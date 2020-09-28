@@ -1,8 +1,6 @@
 package com.itinerarios.entity;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -10,7 +8,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "clasePorVuelo")
@@ -24,12 +25,14 @@ public class ClaseVuelo {
 //	@EmbeddedId
 //	private ClaseVueloId id;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+//	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy= GenerationType.AUTO,generator="native")
+	@GenericGenerator(name = "native",strategy = "native")
 	private Long id;
 	
 ////	@Column(name="codigoVuelo")
 //	@JsonBackReference
-//	@JsonIgnore
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn( name="codigoVuelo", nullable=true)
 	private Vuelo codigoVuelo;

@@ -1,13 +1,18 @@
 package com.itinerarios.springboot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.itinerarios.dto.AeropuertoDTO;
+import com.itinerarios.dto.ClaseVueloDTO;
 import com.itinerarios.dto.VueloDTO;
 import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.Vuelo;
@@ -46,65 +52,105 @@ public class VueloController {
 	
 	@PostMapping(
 			  value = "/crearVuelo", consumes = "application/json", produces = "application/json")
-	public VueloResponseForm crearVuelo(@RequestBody VueloReqCrearForm vueloReqForm) {
-		LOG.info("***** Inicio  greeting *****");
-		LOG.info("***** Fin  greeting *****");
+	public GeneralResponseForm crearVuelo(@RequestBody VueloReqCrearForm vueloReqForm) {
+		LOG.info("***** Inicio  crearVuelo *****");
+	
 
 		String mensajeError = "";
-		GeneralResponseForm formErrorResponse = null; 
-		String pattern = "dd-MM-yyyy";
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-		
-		try { 
-			LocalDate fechaInicio ;
-			Date horaInicio;
-			AeropuertoDTO dtoOrigen = null;
-			AeropuertoDTO dtoDestino = null;
+		GeneralResponseForm formResponse = null; 
+		String pattern = "dd-MM-yyyy HH:mm:ss";
+	    SimpleDateFormat formatter = new SimpleDateFormat(pattern);
 
-			try {
-				fechaInicio =  (LocalDate) formatter.parse(vueloReqForm.getFechaInicio());
-			    
-			} catch (DateTimeParseException e) {
-			    // Thrown if text could not be parsed in the specified format
-				formErrorResponse =new GeneralResponseForm("01 - ***** PARSE ERROR ***** Fecha de inicio con error");
-				throw new ExceptionServiceGeneral(formErrorResponse.getMensaje());
-			}
-			
-			pattern = "HH:mm:ss";
-			formatter = DateTimeFormatter.ofPattern(pattern);
-			try {
-				horaInicio =  (Date) formatter.parse(vueloReqForm.getFechaInicio());
-			    
-			} catch (DateTimeParseException e) {
-			    // Thrown if text could not be parsed in the specified format
-				mensajeError =" 01 ***** PARSE ERROR ***** Fecha de inicio con error";
-	//			throw new ExceptionServiceGeneral(mensajeError.get(0));
-			}
-			
-			try {
-				if (vueloReqForm.getCodigoAeropuertoOrigen().compareTo(vueloReqForm.getCodigoAeropuertoOrigen()) != 0) {
-					Aeropuerto aeropuerto = vueloService.findByAcronimo(vueloReqForm.getCodigoAeropuertoOrigen());
-					dtoOrigen = DTOUtils.convertToDto(aeropuerto);
-					
-					aeropuerto = vueloService.findByAcronimo(vueloReqForm.getCodigoAeropuertoDestino());
-					dtoDestino = DTOUtils.convertToDto(aeropuerto);
-				}
-					
-			} catch(RuntimeException e) {
-//				if(mensajeError.isEmpty())
-//					mensajeError.add(" ****** PARSE ERROR ****** aeropuertos con error - " + vueloReqForm.getCodigoAeropuertoOrigen() + " - " + vueloReqForm.getCodigoAeropuertoDestino());
-			}
+//		DateTimeFormatter formatter = SimpleDateFormat.`ofPattern(pattern);
 		
-			
-		}catch (RuntimeException e) {
-				
+//		LocalDateTime fechaInicio;
+		Date fechaInicio;
+		AeropuertoDTO dtoOrigen = null;
+		AeropuertoDTO dtoDestino = null;
+
+		try {
+			fechaInicio = formatter.parse(vueloReqForm.getFechaInicio() + " " + vueloReqForm.getHoraInicio());
+
+		} catch (DateTimeParseException e) {
+			// Thrown if text could not be parsed in the specified format
+			formResponse = new GeneralResponseForm(
+					"06 - ***** PARSE ERROR ***** Fecha u hora de inicio con error");
+			throw new ExceptionServiceGeneral(formResponse.getMensaje());
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			formResponse = new GeneralResponseForm(
+					"06 - ***** PARSE ERROR ***** Fecha u hora de inicio con error");
+			throw new ExceptionServiceGeneral(formResponse.getMensaje());
+		}
+
+		try {
+			if (Long.valueOf(vueloReqForm.getDuracion()) < 0L) {
+				formResponse = new GeneralResponseForm("07 - ***** PARSE ERROR ***** Duracion con error");
+				throw new ExceptionServiceGeneral(formResponse.getMensaje());
+			}
+		} catch (NumberFormatException e) {
+			formResponse = new GeneralResponseForm("07 - ***** PARSE ERROR ***** Duracion con error");
+			throw new ExceptionServiceGeneral(formResponse.getMensaje());
+		}
+
+		try {
+			if (vueloReqForm.getCodigoAeropuertoOrigen().compareTo(vueloReqForm.getCodigoAeropuertoDestino()) != 0) {
+				Aeropuerto aeropuerto = vueloService.findByAcronimo(vueloReqForm.getCodigoAeropuertoOrigen());
+				dtoOrigen = DTOUtils.convertToDto(aeropuerto);
+
+				aeropuerto = vueloService.findByAcronimo(vueloReqForm.getCodigoAeropuertoDestino());
+				dtoDestino = DTOUtils.convertToDto(aeropuerto);
+			}
+
+		} catch (RuntimeException e) {
+			mensajeError = "04 -  ****** PARSE ERROR ****** aeropuertos con error - "
+					+ vueloReqForm.getCodigoAeropuertoOrigen() + " - " + vueloReqForm.getCodigoAeropuertoDestino();
+			throw new ExceptionServiceGeneral(mensajeError);
 		}
 		
-		return null;
+		if(vueloReqForm.getClasesPorVueloList() == null || vueloReqForm.getClasesPorVueloList().isEmpty()) {
+				mensajeError = "08 -  ****** PARSE ERROR ****** clases por vuelo con error";
+				throw new ExceptionServiceGeneral(mensajeError);
+		} else {
+			for (ClaseVueloDTO idxDTO : vueloReqForm.getClasesPorVueloList()) {
+				try {
+					if (Long.valueOf(idxDTO.getAsientosClaseDisponibles()) < 0L) {
+						formResponse = new GeneralResponseForm(
+								"09 - ***** PARSE ERROR ***** asientosDisponibles con error");
+						throw new ExceptionServiceGeneral(formResponse.getMensaje());
+					}
+				} catch (NumberFormatException e) {
+					formResponse = new GeneralResponseForm(
+							"09 - ***** PARSE ERROR ***** asientosDisponibles con error");
+					throw new ExceptionServiceGeneral(formResponse.getMensaje());
+				}
+			}
+		}
+		VueloDTO vueloDTO = new VueloDTO();
+		vueloDTO.setCodigo(vueloReqForm.getCodigo());
+		vueloDTO.setAeropuerto(dtoOrigen);
+		vueloDTO.setAeropuertoDestino(dtoDestino);
+		vueloDTO.setFechaPartida(fechaInicio);//Date.from(fechaInicio.atZone(ZoneId.systemDefault()).toInstant()));
+		vueloDTO.setDuracion(Long.valueOf(vueloReqForm.getDuracion()));
+		vueloDTO.setDisponible(vueloReqForm.getIsDisponible());
+		vueloDTO.setAsientosDisponibles(34L);
+		Set<ClaseVueloDTO> vuelosSet = new HashSet<ClaseVueloDTO>(vueloReqForm.getClasesPorVueloList());
+
+		vueloDTO.setClases(vuelosSet);
+
+		vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
+		
+		LOG.info("***** Fin  crearVuelo *****");
+		if (mensajeError == null || mensajeError.isEmpty()) {
+			mensajeError = "OK";
+		}
+		formResponse = new GeneralResponseForm(mensajeError);
+		return formResponse;
 	}
 	
 	@GetMapping("/busqueda")
-	public VueloResponseForm obtenerVuelos(@RequestBody VueloReqForm vueloReqForm) {
+	public List<VueloDTO> obtenerVuelos(@RequestBody VueloReqForm vueloReqForm) {
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
 		VueloResponseForm vueloResponseForm = new VueloResponseForm();
 
@@ -179,7 +225,7 @@ public class VueloController {
 			vueloResponseForm.setListVuelos(listDTO);
 			
 			vueloResponseForm.setMensaje(new GeneralResponseForm(mensajeError));
-		return vueloResponseForm;
+		return listDTO;
 	}
 	
 	

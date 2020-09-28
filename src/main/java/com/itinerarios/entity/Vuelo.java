@@ -3,6 +3,7 @@ package com.itinerarios.entity;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,7 +30,7 @@ public class Vuelo {
 //		"disponible" (BOOLEAN)
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+//	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String codigo;
 	private Date fechaPartida;
 	
@@ -48,11 +49,8 @@ public class Vuelo {
 	private Long asientosDisponibles;
 	private Boolean disponible;
 
-//	@Transient
-	 @OneToMany( mappedBy = "codigoVuelo")
-	 @JsonIgnore
-//	 @JsonManagedReference
-//	    @JoinColumn(name = "codigo", referencedColumnName = "codigoVuelo", nullable = false)
+	@OneToMany( mappedBy = "codigoVuelo")// , cascade = CascadeType.ALL)
+//	@JsonIgnore
 	private Set<ClaseVuelo> clases;
 
 	public String getCodigo() {

@@ -1,6 +1,6 @@
-package com.itinerarios.entity;
+package com.itinerarios.dto;
 
-public class RecurrenciaVuelo {
+public class RecurrenciaVueloDTO {
 
 	private String tipoRecurrencia;
 	private Long cantidadRecurrencia;
