@@ -7,8 +7,8 @@ import com.itinerarios.dto.TipoClaseDTO;
 
 public class VueloReqForm {
 
-	private Date fechaInicio;
-	private Date fechaFin;
+	private String fechaInicio;
+	private String fechaFin;
 	private String codigoAeropuertoOrigen;
 	private String codigoAeropuertoDestino;
 	private Long cantidadPasajerosAdultos;
@@ -16,19 +16,19 @@ public class VueloReqForm {
 	
 	private TipoClaseDTO tipoClase;
 
-	public Date getFechaInicio() {
+	public String getFechaInicio() {
 		return fechaInicio;
 	}
 
-	public void setFechaInicio(Date fechaInicio) {
+	public void setFechaInicio(String fechaInicio) {
 		this.fechaInicio = fechaInicio;
 	}
 
-	public Date getFechaFin() {
+	public String getFechaFin() {
 		return fechaFin;
 	}
 
-	public void setFechaFin(Date fechaFin) {
+	public void setFechaFin(String fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 

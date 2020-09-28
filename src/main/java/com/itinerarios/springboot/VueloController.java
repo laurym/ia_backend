@@ -1,36 +1,49 @@
 package com.itinerarios.springboot;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.xml.ws.Response;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.itinerarios.dto.AeropuertoDTO;
 import com.itinerarios.dto.VueloDTO;
+import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.Greeting;
 import com.itinerarios.entity.Vuelo;
+import com.itinerarios.exceptions.ExceptionServiceGeneral;
 import com.itinerarios.request.form.VueloReqForm;
-import com.itinerarios.springboot.repository.VueloRepository;
+import com.itinerarios.response.form.VueloResponseForm;
+import com.itinerarios.service.VueloServiceImpl;
 import com.itinerarios.springboot.utils.DTOUtils;
 
 @RestController
+@CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
 @RequestMapping("rest/vuelos")
 public class VueloController {
 	Logger LOG = LogManager.getLogger(VueloController.class);
 	private static final String template = "Hello, %s!";
 	private final AtomicLong counter = new AtomicLong();
 	
-	@Autowired 
-	private VueloRepository vueloRepository;
-	
+	@Autowired
+	private  VueloServiceImpl vueloService;
 	
 	@PostMapping(
 			  value = "/crearVuelo", consumes = "application/json", produces = "application/json")
@@ -41,9 +54,53 @@ public class VueloController {
 	}
 	
 	@GetMapping("/busqueda")
-	public List<VueloDTO> obtenerVuelos(@RequestBody VueloReqForm vueloReqForm) {
+	public VueloResponseForm obtenerVuelos(@RequestBody VueloReqForm vueloReqForm) {
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
-		Iterable<Vuelo> itObj = vueloRepository.findAll();
+		VueloResponseForm vueloResponseForm = new VueloResponseForm();
+
+		String pattern = "dd-MM-yyyy";
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+		List<String> mensajeError = new ArrayList<String>();
+		
+		try {
+			LocalDate fechaInicio =  (LocalDate) formatter.parse(vueloReqForm.getFechaInicio());
+		    
+		} catch (DateTimeParseException e) {
+		    // Thrown if text could not be parsed in the specified format
+			mensajeError.add(" 01 ***** PARSE ERROR ***** Fecha de inicio con error");
+//			throw new ExceptionServiceGeneral(mensajeError.get(0));
+			
+		}
+		
+		
+		try {
+			LocalDate fechaFin =  (LocalDate) formatter.parse(vueloReqForm.getFechaInicio());
+		    
+		} catch (DateTimeParseException e) {
+		    // Thrown if text could not be parsed in the specified format
+			if(mensajeError.isEmpty())
+					mensajeError.add(" ***** PARSE ERROR ***** Fecha de fin con error");
+		}
+		
+		try {
+			if (vueloReqForm.getCodigoAeropuertoOrigen().compareTo(vueloReqForm.getCodigoAeropuertoDestino()) != 0) {
+				Aeropuerto aeropuerto = vueloService.findByAcronimo(vueloReqForm.getCodigoAeropuertoOrigen());
+				AeropuertoDTO dtoOrigen = null;
+				AeropuertoDTO dtoDestino = null;
+				dtoOrigen = DTOUtils.convertToDto(aeropuerto);
+				
+				aeropuerto = vueloService.findByAcronimo(vueloReqForm.getCodigoAeropuertoDestino());
+				dtoDestino = DTOUtils.convertToDto(aeropuerto);
+			}
+				
+		} catch(RuntimeException e) {
+			if(mensajeError.isEmpty())
+				mensajeError.add(" ****** PARSE ERROR ****** aeropuertos con error - " + vueloReqForm.getCodigoAeropuertoOrigen() + " - " + vueloReqForm.getCodigoAeropuertoDestino());
+		}
+	
+		
+		
+		Iterable<Vuelo> itObj = vueloService.findAllVuelos();
 		Iterator<Vuelo> itObjs = itObj.iterator();
 		
 		List<VueloDTO> listDTO = new ArrayList<VueloDTO>();
@@ -55,6 +112,14 @@ public class VueloController {
 		}
 		
 		LOG.info("***** Fin  obtenerAeropuertos *****");
-	    return listDTO;
+		if(mensajeError.isEmpty())
+			mensajeError.add("OK");
+			
+//		if (mensajeError.toString().isEmpty())
+			vueloResponseForm.setListVuelos(listDTO);
+			vueloResponseForm.setMensaje(mensajeError);
+		return vueloResponseForm;
 	}
+	
+	
 }

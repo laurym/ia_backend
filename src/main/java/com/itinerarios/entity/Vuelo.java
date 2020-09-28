@@ -1,19 +1,22 @@
 package com.itinerarios.entity;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
+@Table(name="vuelo")
 public class Vuelo {
 //	"vuelo"{
 //		"codigo"
@@ -45,9 +48,12 @@ public class Vuelo {
 	private Long asientosDisponibles;
 	private Boolean disponible;
 
-	@Transient
-//	@OneToMany
-	private List<ClaseVuelo> clases;
+//	@Transient
+	 @OneToMany( mappedBy = "codigoVuelo")
+	 @JsonIgnore
+//	 @JsonManagedReference
+//	    @JoinColumn(name = "codigo", referencedColumnName = "codigoVuelo", nullable = false)
+	private Set<ClaseVuelo> clases;
 
 	public String getCodigo() {
 		return codigo;
@@ -121,11 +127,11 @@ public class Vuelo {
 		this.disponible = disponible;
 	}
 
-	public List<ClaseVuelo> getClases() {
+	public Set<ClaseVuelo> getClases() {
 		return clases;
 	}
 
-	public void setClases(List<ClaseVuelo> clases) {
+	public void setClases(Set<ClaseVuelo> clases) {
 		this.clases = clases;
 	}
 }

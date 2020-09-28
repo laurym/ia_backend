@@ -9,10 +9,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -25,29 +27,22 @@ import com.itinerarios.entity.Aerolinea;
 import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.Greeting;
 import com.itinerarios.entity.TipoClase;
-import com.itinerarios.springboot.repository.AerolineaRepository;
-import com.itinerarios.springboot.repository.AeropuertoRepository;
-import com.itinerarios.springboot.repository.TipoClaseRepository;
+import com.itinerarios.service.BaseServiceImpl;
 import com.itinerarios.springboot.utils.DTOUtils;
 
 
 
 @RestController
+@CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
 @RequestMapping("rest")
 public class BaseController {
 
+	@Autowired 
+	private BaseServiceImpl baseService;
+	
 	private static final String template = "Hello, %s!";
 	private final AtomicLong counter = new AtomicLong();
 	Logger LOG = LogManager.getLogger(BaseController.class);
-	
-	@Autowired 
-	private AerolineaRepository aerolineaRepository; 
-	
-	@Autowired 
-	private AeropuertoRepository aeropuertoRepository;
-	
-	@Autowired 
-	private TipoClaseRepository tipoClaseRepository;
 	
 //	@Autowired 
 	@GetMapping("/greeting")
@@ -60,7 +55,7 @@ public class BaseController {
 	@GetMapping("/aeropuertos")
 	public List<AeropuertoDTO> obtenerAeropuertos() {
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
-		Iterable<Aeropuerto> itObj = aeropuertoRepository.findAll();
+		Iterable<Aeropuerto> itObj = baseService.findAllAeropuertos();
 		Iterator<Aeropuerto> itObjs = itObj.iterator();
 		
 		List<AeropuertoDTO> listDTO = new ArrayList<AeropuertoDTO>();
@@ -80,7 +75,7 @@ public class BaseController {
 	public @ResponseBody List<AerolineaDTO> obtenerAerolineas() {
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
 	    // This returns a JSON or XML with the users
-			Iterable<Aerolinea> itAerolinea = aerolineaRepository.findAll();
+			Iterable<Aerolinea> itAerolinea = baseService.findAllAerolineas();
 			Iterator<Aerolinea> itObjs = itAerolinea.iterator();
 			
 			List<AerolineaDTO> listDTO = new ArrayList<AerolineaDTO>();
@@ -103,7 +98,7 @@ public class BaseController {
 		// user here is a prepopulated User instance
 		Aerolinea entity = DTOUtils.convertToEntity(aerolineaDTO);
 	    // This returns a JSON or XML with the users
-			entity = aerolineaRepository.save(entity);
+			entity = baseService.save(entity);
 			
 			LOG.info("***** Fin  obtenerAeropuertos *****");
 		    return DTOUtils.convertToDto(entity);
@@ -112,7 +107,7 @@ public class BaseController {
 	@GetMapping("/clases")
 	public List<TipoClaseDTO> obtenerClases(){ 
 		LOG.info("***** Inicio  obtenerClases *****");
-		Iterable<TipoClase> itObj = tipoClaseRepository.findAll();
+		Iterable<TipoClase> itObj = baseService.findAllTiposClase();
 		Iterator<TipoClase> itObjs = itObj.iterator();
 		
 		List<TipoClaseDTO> listDTO = new ArrayList<TipoClaseDTO>();

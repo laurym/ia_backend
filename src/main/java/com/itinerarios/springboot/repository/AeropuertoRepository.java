@@ -10,4 +10,5 @@ import com.itinerarios.entity.Aeropuerto;
 
 public interface AeropuertoRepository extends CrudRepository<Aeropuerto, Long> {
 
+	public Aeropuerto findByAcronimo(String acronimo);
 }

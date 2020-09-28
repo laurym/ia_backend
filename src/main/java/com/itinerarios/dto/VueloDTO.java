@@ -1,7 +1,9 @@
 package com.itinerarios.dto;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class VueloDTO {
 //	"vuelo"{
@@ -25,7 +27,8 @@ public class VueloDTO {
 	private Long asientosDisponibles;
 	private Boolean disponible;
 
-	private List<ClaseVueloDTO> clases;
+	@JsonIgnore
+	private Set<ClaseVueloDTO> clases;
 
 	public String getCodigo() {
 		return codigo;
@@ -107,11 +110,11 @@ public class VueloDTO {
 		this.disponible = disponible;
 	}
 
-	public List<ClaseVueloDTO> getClases() {
+	public Set<ClaseVueloDTO> getClases() {
 		return clases;
 	}
 
-	public void setClases(List<ClaseVueloDTO> clases) {
+	public void setClases(Set<ClaseVueloDTO> clases) {
 		this.clases = clases;
 	}
 }

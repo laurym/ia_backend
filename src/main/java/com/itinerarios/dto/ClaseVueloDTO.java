@@ -7,41 +7,53 @@ public class ClaseVueloDTO {
 //			"precioClase"
 //		  }
 
-	private String tipoClase;
-	private Long asientosDisponibles;
-	private Double precioClase;
-	private String codigoVuelo;
+	private Long id;
+//	private VueloDTO codigoVuelo;
+	private TipoClaseDTO codigoClase;
+	private Long asientosClaseDisponibles;
+	private Double precio;
 	
-	public String getTipoClase() {
-		return tipoClase;
+	
+
+	public Long getId() {
+		return id;
 	}
 
-	public void setTipoClase(String tipoClase) {
-		this.tipoClase = tipoClase;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
-	public Long getAsientosDisponibles() {
-		return asientosDisponibles;
+//	public VueloDTO getCodigoVuelo() {
+//		return codigoVuelo;
+//	}
+//
+//	public void setCodigoVuelo(VueloDTO vuelo) {
+//		this.codigoVuelo = vuelo;
+//	}
+
+	public TipoClaseDTO getClase() {
+		return codigoClase;
 	}
 
-	public void setAsientosDisponibles(Long asientosDisponibles) {
-		this.asientosDisponibles = asientosDisponibles;
+	public void setClase(TipoClaseDTO clase) {
+		this.codigoClase = clase;
 	}
 
-	public Double getPrecioClase() {
-		return precioClase;
+	public Long getAsientosClaseDisponibles() {
+		return asientosClaseDisponibles;
 	}
 
-	public void setPrecioClase(Double precioClase) {
-		this.precioClase = precioClase;
+	public void setAsientosClaseDisponibles(Long asientosDisponibles) {
+		this.asientosClaseDisponibles = asientosDisponibles;
 	}
 
-	public String getCodigoVuelo() {
-		return codigoVuelo;
+	public Double getPrecio() {
+		return precio;
 	}
 
-	public void setCodigoVuelo(String codigoVuelo) {
-		this.codigoVuelo = codigoVuelo;
+	public void setPrecio(Double precioClase) {
+		this.precio = precioClase;
 	}
+
 
 }
