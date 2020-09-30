@@ -1,8 +1,5 @@
 package com.itinerarios.request.form;
 
-
-import java.util.Date;
-
 import com.itinerarios.dto.TipoClaseDTO;
 
 public class VueloReqForm extends GeneralReqForm{

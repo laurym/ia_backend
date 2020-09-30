@@ -3,7 +3,6 @@ package com.itinerarios.dto;
 import java.util.Date;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class VueloDTO {
 //	"vuelo"{

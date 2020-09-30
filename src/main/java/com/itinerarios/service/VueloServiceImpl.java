@@ -1,5 +1,6 @@
 package com.itinerarios.service;
 
+import java.util.Date;
 import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.ClaseVuelo;
 import com.itinerarios.entity.Vuelo;
+import com.itinerarios.exceptions.ExceptionServiceGeneral;
 import com.itinerarios.springboot.repository.AerolineaRepository;
 import com.itinerarios.springboot.repository.AeropuertoRepository;
 import com.itinerarios.springboot.repository.ClaseVueloRepository;
@@ -63,6 +65,27 @@ public class VueloServiceImpl {
 		return getVueloRepository().findAll();
 	}
 	
+	public Iterable<Vuelo> findAvailableFlights(String airportOrigin, String airportDest, Date date) throws  ExceptionServiceGeneral{
+		String mensajeError=null;
+		Iterable<Vuelo> vuelos = null;
+		try {
+			if (!airportOrigin.toUpperCase().equals(airportDest.toUpperCase())) {
+				Aeropuerto origin = findByAcronimo(airportOrigin.toUpperCase());
+				Aeropuerto destination = findByAcronimo(airportDest.toUpperCase());
+				
+//				 vuelos = getVueloRepository().findByByDateAeropuertoAeropuertoDestino(origin.getId(), destination.getId(), date);
+				vuelos = getVueloRepository().findByByAeropuertoAeropuertoDestino(origin.getId(), destination.getId());
+			}
+
+		} catch (RuntimeException e) {
+			mensajeError = "04 -  ****** PARSE ERROR ****** aeropuertos con error - "
+					+ airportOrigin.toUpperCase() + " - " + airportDest.toUpperCase();
+			throw new ExceptionServiceGeneral(mensajeError);
+		}
+//		return getVueloRepository().findAll();
+		return vuelos;
+	}
+
 	public void saveVuelo(Vuelo entity) {
 		
 		getVueloRepository().save(entity);
