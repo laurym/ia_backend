@@ -6,6 +6,7 @@ import java.util.Iterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.itinerarios.entity.Aerolinea;
 import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.ClaseVuelo;
 import com.itinerarios.entity.Vuelo;
@@ -73,7 +74,6 @@ public class VueloServiceImpl {
 				Aeropuerto origin = findByAcronimo(airportOrigin.toUpperCase());
 				Aeropuerto destination = findByAcronimo(airportDest.toUpperCase());
 				
-//				 vuelos = getVueloRepository().findByByDateAeropuertoAeropuertoDestino(origin.getId(), destination.getId(), date);
 				vuelos = getVueloRepository().findByByAeropuertoAeropuertoDestino(origin.getId(), destination.getId());
 			}
 
@@ -82,7 +82,6 @@ public class VueloServiceImpl {
 					+ airportOrigin.toUpperCase() + " - " + airportDest.toUpperCase();
 			throw new ExceptionServiceGeneral(mensajeError);
 		}
-//		return getVueloRepository().findAll();
 		return vuelos;
 	}
 
@@ -90,8 +89,6 @@ public class VueloServiceImpl {
 		
 		getVueloRepository().save(entity);
 		Iterator<ClaseVuelo> itClasesVuelos = entity.getClases().iterator();
-		Boolean setearValor = Boolean.TRUE;
-		System.out.println(" primerValor " + setearValor);
 		while (itClasesVuelos.hasNext()) {
 			ClaseVuelo idxObj = itClasesVuelos.next();
 			ClaseVuelo claseBase = getClaseVueloRepository().find(entity.getCodigo(), idxObj.getCodigoClase().getCodigoClase());
@@ -104,7 +101,10 @@ public class VueloServiceImpl {
 			}
 		}
 		
-		setearValor = false;
-		System.out.println(setearValor);
+		getAerolineaRepository().save(entity.getAerolinea());
+	}
+	
+	public Aerolinea findAerolinea(String codigoAerolinea) {
+		return getAerolineaRepository().find(codigoAerolinea);
 	}
 }

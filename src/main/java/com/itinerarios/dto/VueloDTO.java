@@ -1,6 +1,5 @@
 package com.itinerarios.dto;
 
-import java.util.Date;
 import java.util.Set;
 
 
@@ -16,19 +15,17 @@ public class VueloDTO {
 //		"disponible" (BOOLEAN)
 
 	private String codigo;
-	private Date fechaPartida;
-	private Date horaPartida;
+	private String fechaPartida;
+	private String horaPartida;
 	private Long duracion;
-//	private String codigoAeropuerto;
-//	private String codigoAeropuertoDestino;
 	private AeropuertoDTO aeropuerto;
 	private AeropuertoDTO aeropuertoDestino;
 	private Long asientosDisponibles;
 	private Boolean disponible;
 
-//	@JsonIgnore
 	private Set<ClaseVueloDTO> clases;
-
+	private AerolineaDTO aerolinea;
+	
 	public String getCodigo() {
 		return codigo;
 	}
@@ -37,19 +34,19 @@ public class VueloDTO {
 		this.codigo = codigo;
 	}
 
-	public Date getFechaPartida() {
+	public String getFechaPartida() {
 		return fechaPartida;
 	}
 
-	public void setFechaPartida(Date fechaPartida) {
+	public void setFechaPartida(String fechaPartida) {
 		this.fechaPartida = fechaPartida;
 	}
 
-	public Date getHoraPartida() {
+	public String getHoraPartida() {
 		return horaPartida;
 	}
 
-	public void setHoraPartida(Date horaPartida) {
+	public void setHoraPartida(String horaPartida) {
 		this.horaPartida = horaPartida;
 	}
 
@@ -57,25 +54,13 @@ public class VueloDTO {
 		return duracion;
 	}
 
+	/**
+	 * 
+	 * @param duracion la duracion es en minutos
+	 */
 	public void setDuracion(Long duracion) {
 		this.duracion = duracion;
 	}
-
-//	public String getCodigoAeropuerto() {
-//		return codigoAeropuerto;
-//	}
-//
-//	public void setCodigoAeropuerto(String codigoAeropuerto) {
-//		this.codigoAeropuerto = codigoAeropuerto;
-//	}
-//
-//	public String getCodigoAeropuertoDestino() {
-//		return codigoAeropuertoDestino;
-//	}
-//
-//	public void setCodigoAeropuertoDestino(String codigoAeropuertoDestino) {
-//		this.codigoAeropuertoDestino = codigoAeropuertoDestino;
-//	}
 
 	public AeropuertoDTO getAeropuerto() {
 		return aeropuerto;
@@ -115,5 +100,13 @@ public class VueloDTO {
 
 	public void setClases(Set<ClaseVueloDTO> clases) {
 		this.clases = clases;
+	}
+
+	public AerolineaDTO getAerolinea() {
+		return aerolinea;
+	}
+
+	public void setAerolinea(AerolineaDTO aerolinea) {
+		this.aerolinea = aerolinea;
 	}
 }

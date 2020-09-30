@@ -19,10 +19,9 @@ public class Vuelo {
 	@Id
 //	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String codigo;
-	private Date fechaPartida;
+	private String fechaPartida;
 	
-	@Transient
-	private Date horaPartida;
+	private String horaPartida;
 	private Long duracion;
 	
 	@OneToOne
@@ -37,8 +36,11 @@ public class Vuelo {
 	private Boolean disponible;
 
 	@OneToMany( mappedBy = "codigoVuelo")// , cascade = CascadeType.ALL)
-//	@JsonIgnore
 	private Set<ClaseVuelo> clases;
+	
+	@OneToOne
+    @JoinColumn(name = "aerolinea", referencedColumnName = "id", nullable = false)
+	private Aerolinea aerolinea;
 
 	public String getCodigo() {
 		return codigo;
@@ -48,19 +50,19 @@ public class Vuelo {
 		this.codigo = codigo;
 	}
 
-	public Date getFechaPartida() {
+	public String getFechaPartida() {
 		return fechaPartida;
 	}
 
-	public void setFechaPartida(Date fechaPartida) {
+	public void setFechaPartida(String fechaPartida) {
 		this.fechaPartida = fechaPartida;
 	}
 
-	public Date getHoraPartida() {
+	public String getHoraPartida() {
 		return horaPartida;
 	}
 
-	public void setHoraPartida(Date horaPartida) {
+	public void setHoraPartida(String horaPartida) {
 		this.horaPartida = horaPartida;
 	}
 
@@ -110,5 +112,13 @@ public class Vuelo {
 
 	public void setClases(Set<ClaseVuelo> clases) {
 		this.clases = clases;
+	}
+
+	public Aerolinea getAerolinea() {
+		return aerolinea;
+	}
+
+	public void setAerolinea(Aerolinea aerolinea) {
+		this.aerolinea = aerolinea;
 	}
 }

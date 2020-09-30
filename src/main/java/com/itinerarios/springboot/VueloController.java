@@ -2,6 +2,7 @@ package com.itinerarios.springboot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.itinerarios.dto.AerolineaDTO;
 import com.itinerarios.dto.AeropuertoDTO;
 import com.itinerarios.dto.ClaseVueloDTO;
 import com.itinerarios.dto.VueloDTO;
@@ -58,9 +60,16 @@ public class VueloController {
 		Date fechaInicio;
 		AeropuertoDTO dtoOrigen = null;
 		AeropuertoDTO dtoDestino = null;
-
+		AerolineaDTO aerolineaDTO = null;
+		
 		try {
 			fechaInicio = formatter.parse(vueloReqForm.getFechaInicio() + " " + vueloReqForm.getHoraInicio());
+			Date fechaAComparar = new Date(Instant.now().toEpochMilli());
+			
+			if(fechaAComparar.compareTo(fechaInicio) > 0) {
+				formResponse = new GeneralResponseForm("10 - ***** PARSE ERROR ***** La fecha tiene que ser mayor a la actual");
+				throw new ExceptionServiceGeneral(formResponse.getMensaje());
+			}
 
 		} catch (DateTimeParseException e) {
 			// Thrown if text could not be parsed in the specified format
@@ -116,18 +125,45 @@ public class VueloController {
 				}
 			}
 		}
+		
+		try {
+			if (Long.valueOf(vueloReqForm.getPorcentajeDescuentoMenor()) < 0L) {
+				formResponse = new GeneralResponseForm("12 - ***** DESCUENTO ERROR ***** Descuento menores con error");
+				throw new ExceptionServiceGeneral(formResponse.getMensaje());
+			}
+		} catch (NumberFormatException e) {
+			formResponse = new GeneralResponseForm("12 - ***** DESCUENTO ERROR ***** Descuento con error");
+			throw new ExceptionServiceGeneral(formResponse.getMensaje());
+		}
+		
+		if (vueloReqForm.getAerolineaCodigo() == null) {
+			mensajeError = "11 -  ****** AEROLINEA ERROR ****** aerolinea con error";
+			throw new ExceptionServiceGeneral(mensajeError);
+		} else {
+			aerolineaDTO = DTOUtils.convertToDto(vueloService.findAerolinea(vueloReqForm.getAerolineaCodigo()));
+
+			if (aerolineaDTO == null) {
+				mensajeError = "11 -  ****** AEROLINEA ERROR ****** aerolinea con error";
+				throw new ExceptionServiceGeneral(mensajeError);
+			}
+			aerolineaDTO.setPorcentajeDescuentoMenores(Long.valueOf(vueloReqForm.getPorcentajeDescuentoMenor()));
+		}
+		
 		VueloDTO vueloDTO = new VueloDTO();
 		vueloDTO.setCodigo(vueloReqForm.getCodigo());
 		vueloDTO.setAeropuerto(dtoOrigen);
 		vueloDTO.setAeropuertoDestino(dtoDestino);
-		vueloDTO.setFechaPartida(fechaInicio);// Date.from(fechaInicio.atZone(ZoneId.systemDefault()).toInstant()));
+		vueloDTO.setFechaPartida(vueloReqForm.getFechaInicio());
+		vueloDTO.setHoraPartida(vueloReqForm.getHoraInicio());
 		vueloDTO.setDuracion(Long.valueOf(vueloReqForm.getDuracion()));
 		vueloDTO.setDisponible(vueloReqForm.getIsDisponible());
 		vueloDTO.setAsientosDisponibles(34L);
 		Set<ClaseVueloDTO> vuelosSet = new HashSet<ClaseVueloDTO>(vueloReqForm.getClasesPorVueloList());
 
 		vueloDTO.setClases(vuelosSet);
-
+		
+		vueloDTO.setAerolinea(aerolineaDTO);
+		
 		vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
 
 		LOG.info("***** Fin  crearVuelo *****");
@@ -144,8 +180,7 @@ public class VueloController {
 		VueloResponseForm vueloResponseForm = new VueloResponseForm();
 
 		String mensajeError = "";
-//		GeneralResponseForm formResponse = null;
-		String pattern = "dd/MM/yyyy";
+		String pattern = "dd-MM-yyyy";
 		SimpleDateFormat formatter = new SimpleDateFormat(pattern);
 
 		Date travelDate;

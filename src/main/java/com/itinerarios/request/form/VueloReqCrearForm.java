@@ -17,6 +17,8 @@ public class VueloReqCrearForm extends GeneralReqForm {
 	
 	private List<ClaseVueloDTO> clasesPorVueloList;
 	private Boolean isDisponible;
+	private String aerolineaCodigo;
+	private String porcentajeDescuentoMenor;
 	
 	private RecurrenciaVueloDTO recurrencia;
 	
@@ -86,6 +88,22 @@ public class VueloReqCrearForm extends GeneralReqForm {
 
 	public void setIsDisponible(Boolean isDisponible) {
 		this.isDisponible = isDisponible;
+	}
+
+	public String getAerolineaCodigo() {
+		return aerolineaCodigo;
+	}
+
+	public void setAerolineaCodigo(String aerolineaCodigo) {
+		this.aerolineaCodigo = aerolineaCodigo;
+	}
+
+	public String getPorcentajeDescuentoMenor() {
+		return porcentajeDescuentoMenor;
+	}
+
+	public void setPorcentajeDescuentoMenor(String porcentajeDescuentoMenor) {
+		this.porcentajeDescuentoMenor = porcentajeDescuentoMenor;
 	}
 
 	public RecurrenciaVueloDTO getRecurrencia() {
