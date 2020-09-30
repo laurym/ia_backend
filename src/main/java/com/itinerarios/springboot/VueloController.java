@@ -113,11 +113,10 @@ public class VueloController {
 		} else {
 			for (ClaseVueloDTO idxDTO : vueloReqForm.getClasesPorVueloList()) {
 				try {
-					if (Long.valueOf(idxDTO.getAsientosClaseDisponibles()) < 0L) {
-						formResponse = new GeneralResponseForm(
-								"09 - ***** PARSE ERROR ***** asientosDisponibles con error");
+					if (Long.valueOf(idxDTO.getAsientosClaseDisponibles()) <= 0L) {
+						formResponse = new GeneralResponseForm("09 - ***** PARSE ERROR ***** asientosDisponibles con error");
 						throw new ExceptionServiceGeneral(formResponse.getMensaje());
-					}
+					} 
 				} catch (NumberFormatException e) {
 					formResponse = new GeneralResponseForm(
 							"09 - ***** PARSE ERROR ***** asientosDisponibles con error");
@@ -157,11 +156,17 @@ public class VueloController {
 		vueloDTO.setHoraPartida(vueloReqForm.getHoraInicio());
 		vueloDTO.setDuracion(Long.valueOf(vueloReqForm.getDuracion()));
 		vueloDTO.setDisponible(vueloReqForm.getIsDisponible());
-		vueloDTO.setAsientosDisponibles(34L);
 		Set<ClaseVueloDTO> vuelosSet = new HashSet<ClaseVueloDTO>(vueloReqForm.getClasesPorVueloList());
 
 		vueloDTO.setClases(vuelosSet);
+		Iterator <ClaseVueloDTO> iterator = vueloDTO.getClases().iterator();
+		Long asientosDisponiblesTotal = 0L;
+		while (iterator.hasNext()) {
+			ClaseVueloDTO idxDTO = iterator.next();
+			asientosDisponiblesTotal += idxDTO.getAsientosClaseDisponibles();		
+		}
 		
+		vueloDTO.setAsientosDisponibles(asientosDisponiblesTotal);
 		vueloDTO.setAerolinea(aerolineaDTO);
 		
 		vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
