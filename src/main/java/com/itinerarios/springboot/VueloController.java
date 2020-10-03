@@ -186,7 +186,7 @@ public class VueloController {
 		String mensajeError = "";
 		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA);
 
-		Date travelDate;
+		Date travelDate = null;
 		List<VueloDTO> listDTO = new ArrayList<VueloDTO>();
 		try {
 
@@ -227,15 +227,13 @@ public class VueloController {
 				vueloReqForm.setTipoClase(tipoClase);
 			}
 
-			Long cantidadPasajeros = vueloReqForm.getCantidadPasajerosAdultos()
-					+ vueloReqForm.getCantidadPasajerosMenores();
+			Long cantidadPasajeros = vueloReqForm.getCantidadPasajerosAdultos() + vueloReqForm.getCantidadPasajerosMenores();
 
-			String codigoClase = vueloReqForm.getTipoClase() == null ? null
-					: vueloReqForm.getTipoClase().getCodigoClase();
+			String codigoClase = vueloReqForm.getTipoClase() == null ? null : vueloReqForm.getTipoClase().getCodigoClase();
 
 			Iterable<Vuelo> itObj = vueloService.findAvailableFlights(
-					vueloReqForm.getCodigoAeropuertoOrigen().toUpperCase(), vueloReqForm.getCodigoAeropuertoDestino(),
-					cantidadPasajeros, vueloReqForm.getFechaInicio(), codigoClase);
+												 vueloReqForm.getCodigoAeropuertoOrigen().toUpperCase(), vueloReqForm.getCodigoAeropuertoDestino(),
+												 cantidadPasajeros, vueloReqForm.getFechaInicio(), codigoClase);
 			Iterator<Vuelo> itObjs = itObj.iterator();
 
 			Double valorTotal = 0D;
@@ -249,14 +247,22 @@ public class VueloController {
 					precio = claseIdx.getPrecio();
 				}
 				valorTotal = precio
-						* (vueloReqForm.getCantidadPasajerosAdultos() + vueloReqForm.getCantidadPasajerosMenores()
+								* (vueloReqForm.getCantidadPasajerosAdultos() + vueloReqForm.getCantidadPasajerosMenores()
 								* (dto.getAerolinea().getPorcentajeDescuentoMenores() / 100));
 				dto.setValorTotal(valorTotal);
+				SimpleDateFormat formatter2 = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA_CON_HORA);
+				Date fechaInicio = formatter2.parse(dto.getFechaPartida() + " " + dto.getHoraPartida());
+				Date fechaLlegada = new Date (fechaInicio.getTime() + vuelo.getDuracion() * ConstantsUtil.MULTIPLIER_MINUTE);
+				
+				String date = formatter2.format(fechaLlegada);
+				String [] arrayDate = date.split(" ");
+				
+				dto.setFechaLlegada(arrayDate[0]);
+				dto.setHoraLlegada(arrayDate[1]);
+				
 				listDTO.add(dto);
 
 			}
-//			}
-//		
 
 			LOG.info("***** Fin  obtenerAeropuertos *****");
 			if (mensajeError == null || mensajeError.isEmpty())
@@ -268,8 +274,12 @@ public class VueloController {
 		} catch (RuntimeException e) {
 			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error";
 			throw new ExceptionServiceGeneral(mensajeError);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error";
+			throw new ExceptionServiceGeneral(mensajeError);
 		}
-
 	}
 	
 }

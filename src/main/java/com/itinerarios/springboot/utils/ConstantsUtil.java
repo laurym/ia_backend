@@ -12,7 +12,7 @@ public class ConstantsUtil {
 	public static String ENDPOINT_LOGOS="http://pics.avs.io/200/200/CODIGO_AEROLINEA.png"; 
 	public static String CODIGO_CLASE_DEFAULT = "YC";
 	public static Long CANTIDAD_PASAJEROS_DEFAULT=1L;
-	
+	public static Long MULTIPLIER_MINUTE = 60000L;
 	
 //	x-api-key = tenant 
 //	para desencriptar un token , se usa el secreto "public_token"

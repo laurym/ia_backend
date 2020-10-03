@@ -17,6 +17,8 @@ public class VueloDTO {
 	private String codigo;
 	private String fechaPartida;
 	private String horaPartida;
+	private String fechaLlegada;
+	private String horaLlegada;
 	private Long duracion;
 	private AeropuertoDTO aeropuerto;
 	private AeropuertoDTO aeropuertoDestino;
@@ -50,6 +52,22 @@ public class VueloDTO {
 
 	public void setHoraPartida(String horaPartida) {
 		this.horaPartida = horaPartida;
+	}
+
+	public String getFechaLlegada() {
+		return fechaLlegada;
+	}
+
+	public void setFechaLlegada(String fechaLlegada) {
+		this.fechaLlegada = fechaLlegada;
+	}
+
+	public String getHoraLlegada() {
+		return horaLlegada;
+	}
+
+	public void setHoraLlegada(String horaLlegada) {
+		this.horaLlegada = horaLlegada;
 	}
 
 	public Long getDuracion() {
