@@ -214,7 +214,7 @@ public class VueloController {
 					ClaseVueloDTO claseIdx = clasesSet.next();
 					precio = claseIdx.getPrecio();
 				}
-				valorTotal = vueloReqForm.getCantidadPasajerosAdultos() * precio + vueloReqForm.getCantidadPasajerosMenores() * (dto.getAerolinea().getPorcentajeDescuentoMenores()/100);
+				valorTotal =  precio * ( vueloReqForm.getCantidadPasajerosAdultos()  + vueloReqForm.getCantidadPasajerosMenores() * (dto.getAerolinea().getPorcentajeDescuentoMenores()/100));
 				dto.setValorTotal(valorTotal);
 				listDTO.add(dto);
 				
