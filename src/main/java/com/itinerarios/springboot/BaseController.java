@@ -33,8 +33,10 @@ import com.itinerarios.springboot.utils.DTOUtils;
 
 
 @RestController
-@CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
-@RequestMapping("rest")
+@CrossOrigin(origins="*", methods= {RequestMethod.GET,RequestMethod.POST})
+@RequestMapping(value= "rest")//, consumes = MediaType.APPLICATION_JSON_VALUE, 
+//produces = MediaType.APPLICATION_JSON_VALUE,
+//method = {RequestMethod.GET})
 public class BaseController {
 
 	@Autowired 
@@ -71,9 +73,9 @@ public class BaseController {
 	}
 	
 	
-	@GetMapping("/aerolineas")
+	@GetMapping("/aerolineas" )
 	public @ResponseBody List<AerolineaDTO> obtenerAerolineas() {
-		LOG.info("***** Inicio  obtenerAeropuertos *****");
+		LOG.info("***** Inicio  obtenerAerolineas *****");
 	    // This returns a JSON or XML with the users
 			Iterable<Aerolinea> itAerolinea = baseService.findAllAerolineas();
 			Iterator<Aerolinea> itObjs = itAerolinea.iterator();
@@ -86,21 +88,21 @@ public class BaseController {
 				listDTO.add(dto);
 			}
 			
-			LOG.info("***** Fin  obtenerAeropuertos *****");
+			LOG.info("***** Fin  obtenererolineas *****");
 		    return listDTO;
 	}
 	
-	@PostMapping(value = "/aerolineas", consumes = "application/json", produces = "application/json")
+	@PostMapping(value = "/guardarAerolineas", consumes = "application/json", produces = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
 	public AerolineaDTO guardarAerolineas(@RequestBody AerolineaDTO aerolineaDTO) {
-		LOG.info("***** Inicio  obtenerAeropuertos *****");
+		LOG.info("***** Inicio  guardarAerolineas *****");
 		// user here is a prepopulated User instance
 		Aerolinea entity = DTOUtils.convertToEntity(aerolineaDTO);
 	    // This returns a JSON or XML with the users
 			entity = baseService.save(entity);
 			
-			LOG.info("***** Fin  obtenerAeropuertos *****");
+			LOG.info("***** Fin  guardarAerolineas *****");
 		    return DTOUtils.convertToDto(entity);
 	}
 	
