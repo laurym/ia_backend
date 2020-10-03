@@ -73,14 +73,16 @@ public class VueloServiceImpl {
 			if (!airportOrigin.toUpperCase().equals(airportDest.toUpperCase())) {
 				Aeropuerto origin = findByAcronimo(airportOrigin.toUpperCase());
 				Aeropuerto destination = findByAcronimo(airportDest.toUpperCase());
-				if (date == null || date.isEmpty() && tipoClase ==null || tipoClase.isEmpty())
-					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestino(origin.getId(), destination.getId());
+//				if (date == null || date.isEmpty() && tipoClase ==null || tipoClase.isEmpty())
+//					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestino(origin.getId(), destination.getId(), asientosDisponibles);
 				
-				else if ((date != null || !date.isEmpty()) && (tipoClase ==null  || tipoClase.isEmpty()))
-					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoClase(origin.getId(), destination.getId(), asientosDisponibles , date);
+//				else 
+//					if ((date != null || !date.isEmpty()) && (tipoClase ==null  || tipoClase.isEmpty()))
+//					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoFecha(origin.getId(), destination.getId(), asientosDisponibles , date);
 				
-				else if ((date == null || date.isEmpty()) && (tipoClase !=null &&  !tipoClase.isEmpty()))
-					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoFecha(origin.getId(), destination.getId(), tipoClase);
+//				else
+					if ((date == null || date.isEmpty()) && (tipoClase !=null &&  !tipoClase.isEmpty()))
+					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoClase(origin.getId(), destination.getId(), asientosDisponibles, tipoClase);
 				
 				else
 					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoFechaClase(origin.getId(), destination.getId(), asientosDisponibles, date, tipoClase);

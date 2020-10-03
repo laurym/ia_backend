@@ -1,5 +1,7 @@
 package com.itinerarios.springboot.repository;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -68,12 +70,18 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 									+  " and vuelo.aeropuertoDestino.id = :aeropuertoDestino"
 									+  " and claseVuelo.codigoClase.codigoClase = :tipoClase "
 				    				+  " and claseVuelo.asientosClaseDisponibles >= :asientosClase "
+									+  " and vuelo.fechaPartida >=  :fecha "
 									+ " ORDER by vuelo.fechaPartida asc, vuelo.horaPartida asc";
+			
 			Query query = entityManager.createQuery(consultaPorVuelos);
-			List<Vuelo> vuelos = query.getResultList();
 			query.setParameter("aeropuerto", aeropuerto);
 	    	query.setParameter("aeropuertoDestino", aeropuertoDestino);
 	    	query.setParameter("tipoClase", tipoClase);
+	    	
+	    	LocalDate today = LocalDate.now();
+    	   	String formattedDate = today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+	    	query.setParameter("fecha", "\'"+formattedDate+"\'");
+	    	
 	    	query.setParameter("asientosClase", asientosDisponibles);
 	    	
 	    	List<Object[]> vuelosBase  = query.getResultList();
