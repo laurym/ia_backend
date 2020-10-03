@@ -1,6 +1,7 @@
 package com.itinerarios.springboot.utils;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.itinerarios.dto.AerolineaDTO;
 import com.itinerarios.dto.AeropuertoDTO;
@@ -13,10 +14,17 @@ import com.itinerarios.entity.Vuelo;
 
 public class DTOUtils {
 
+	@Value("${endpoint_logos_aerolineas}")
+	private static String baseLogosEndpoint;
 	
 	public static AerolineaDTO convertToDto(Aerolinea obj) {
 		ModelMapper modelMapper = new ModelMapper();
 		AerolineaDTO dto = modelMapper.map(obj, AerolineaDTO.class);
+		if(dto!=null) { 
+			String baseEndpoint = baseLogosEndpoint != null?  baseLogosEndpoint :  ConstantsUtil.ENDPOINT_LOGOS;
+			String linkLogo = baseEndpoint.replaceAll(ConstantsUtil.CODIGO_AEROLINEA, dto.getCodigoAerolinea().toUpperCase());
+			dto.setLogoLink(linkLogo);
+		}
 	    return dto;
 	}
 	
@@ -53,6 +61,13 @@ public class DTOUtils {
 	public static VueloDTO convertToDto(Vuelo obj) {
 		ModelMapper modelMapper = new ModelMapper();
 		VueloDTO dto = modelMapper.map(obj, VueloDTO.class);
+		if(dto!=null) { 
+			String baseEndpoint = baseLogosEndpoint != null?  baseLogosEndpoint :  ConstantsUtil.ENDPOINT_LOGOS;
+			String linkLogo = baseEndpoint.replaceAll(ConstantsUtil.CODIGO_AEROLINEA, dto.getAerolinea().getCodigoAerolinea().toUpperCase());
+			dto.getAerolinea().setLogoLink(linkLogo);
+		}
+		
+		
 	    return dto;
 	}
 	

@@ -22,16 +22,11 @@ public class ClaseVuelo {
 //			"precioClase"
 //		  }
 
-//	@EmbeddedId
-//	private ClaseVueloId id;
 	@Id
-//	@GeneratedValue(strategy = GenerationType.AUTO)
 	@GeneratedValue(strategy= GenerationType.AUTO,generator="native")
 	@GenericGenerator(name = "native",strategy = "native")
 	private Long id;
 	
-////	@Column(name="codigoVuelo")
-//	@JsonBackReference
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn( name="codigoVuelo", nullable=true)
@@ -68,14 +63,6 @@ public class ClaseVuelo {
 	public void setCodigoClase(TipoClase clase) {
 		this.codigoClase = clase;
 	}
-
-//	public ClaseVueloId getId() {
-//		return id;
-//	}
-//
-//	public void setId(ClaseVueloId id) {
-//		this.id = id;
-//	}
 
 	public Long getAsientosClaseDisponibles() {
 		return asientosClaseDisponibles;

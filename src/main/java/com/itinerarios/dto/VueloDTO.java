@@ -26,6 +26,8 @@ public class VueloDTO {
 	private Set<ClaseVueloDTO> clases;
 	private AerolineaDTO aerolinea;
 	
+	private Double valorTotal;
+	
 	public String getCodigo() {
 		return codigo;
 	}
@@ -108,5 +110,13 @@ public class VueloDTO {
 
 	public void setAerolinea(AerolineaDTO aerolinea) {
 		this.aerolinea = aerolinea;
+	}
+
+	public Double getValorTotal() {
+		return valorTotal;
+	}
+
+	public void setValorTotal(Double valorTotal) {
+		this.valorTotal = valorTotal;
 	}
 }

@@ -1,8 +1,8 @@
 package com.itinerarios.service;
 
-import java.util.Date;
 import java.util.Iterator;
 
+import org.hibernate.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,18 +66,36 @@ public class VueloServiceImpl {
 		return getVueloRepository().findAll();
 	}
 	
-	public Iterable<Vuelo> findAvailableFlights(String airportOrigin, String airportDest, Date date) throws  ExceptionServiceGeneral{
+	public Iterable<Vuelo> findAvailableFlights(String airportOrigin, String airportDest, Long asientosDisponibles,String date, String tipoClase) throws  ExceptionServiceGeneral{
 		String mensajeError=null;
 		Iterable<Vuelo> vuelos = null;
 		try {
 			if (!airportOrigin.toUpperCase().equals(airportDest.toUpperCase())) {
 				Aeropuerto origin = findByAcronimo(airportOrigin.toUpperCase());
 				Aeropuerto destination = findByAcronimo(airportDest.toUpperCase());
+				if (date == null || date.isEmpty() && tipoClase ==null || tipoClase.isEmpty())
+					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestino(origin.getId(), destination.getId());
 				
-				vuelos = getVueloRepository().findByByAeropuertoAeropuertoDestino(origin.getId(), destination.getId());
+				else if ((date != null || !date.isEmpty()) && (tipoClase ==null  || tipoClase.isEmpty()))
+					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoClase(origin.getId(), destination.getId(), asientosDisponibles , date);
+				
+				else if ((date == null || date.isEmpty()) && (tipoClase !=null &&  !tipoClase.isEmpty()))
+					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoFecha(origin.getId(), destination.getId(), tipoClase);
+				
+				else
+					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoFechaClase(origin.getId(), destination.getId(), asientosDisponibles, date, tipoClase);
+					
 			}
 
-		} catch (RuntimeException e) {
+		} 
+		catch (QueryException e) {
+		System.out.println(e.getMessage());
+			mensajeError = "05 -  ****** SYSTEM ERROR ****** búsqueda con error - "
+					+ airportOrigin.toUpperCase() + " - " + airportDest.toUpperCase();
+			throw new ExceptionServiceGeneral(mensajeError);
+		}catch (RuntimeException e) {
+			System.out.println(e.getMessage());
+
 			mensajeError = "04 -  ****** PARSE ERROR ****** aeropuertos con error - "
 					+ airportOrigin.toUpperCase() + " - " + airportDest.toUpperCase();
 			throw new ExceptionServiceGeneral(mensajeError);
@@ -93,6 +111,7 @@ public class VueloServiceImpl {
 			ClaseVuelo idxObj = itClasesVuelos.next();
 			ClaseVuelo claseBase = getClaseVueloRepository().find(entity.getCodigo(), idxObj.getCodigoClase().getCodigoClase());
 			if (claseBase == null) {
+				idxObj.setCodigoVuelo(entity);
 				getClaseVueloRepository().save(idxObj);
 			} else {
 				claseBase.setAsientosClaseDisponibles(idxObj.getAsientosClaseDisponibles());

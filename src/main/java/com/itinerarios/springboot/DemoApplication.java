@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @ComponentScan("com.itinerarios")
-@EnableJpaRepositories(basePackages = { "com.itinerarios" })
+@EnableJpaRepositories(basePackages = { "com.itinerarios", "com.itinerarios.springboot.iface.repository" })
 @EntityScan("com.itinerarios.*")   
 public class DemoApplication {
 

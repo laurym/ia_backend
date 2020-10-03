@@ -12,7 +12,8 @@ public class AerolineaDTO {
 	private String nombreAerolinea;
 	private String codigoAerolinea;
 	private Long porcentajeDescuentoMenores;
-
+	private String logoLink;
+	
 	public Long getId() {
 		return id;
 	}
@@ -43,6 +44,14 @@ public class AerolineaDTO {
 
 	public void setPorcentajeDescuentoMenores(Long porcentajeDescuentoMenores) {
 		this.porcentajeDescuentoMenores = porcentajeDescuentoMenores;
+	}
+
+	public String getLogoLink() {
+		return logoLink;
+	}
+
+	public void setLogoLink(String logoLink) {
+		this.logoLink = logoLink;
 	}
 
 }
