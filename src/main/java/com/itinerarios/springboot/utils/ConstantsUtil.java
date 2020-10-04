@@ -2,7 +2,8 @@ package com.itinerarios.springboot.utils;
 
 public class ConstantsUtil {
 	
-	public static String API_KEY ="x-api-key";
+	public static String API_KEY ="667CC8E484F91BCC89";
+	public static String SECRETO = "50E25EC9B0517772A7EA5A4078A69E38AE0B48BDFFE1857D63933885829723C8";
 	public static String TENANT="tenant";
 	public static String ALGORITHM="HS512";
 	
