@@ -2,12 +2,15 @@ package com.itinerarios.springboot;
 
 import java.io.IOException;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,12 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itinerarios.request.form.UsuarioReqCrearForm;
 import com.itinerarios.request.form.UsuarioReqForm;
-import com.itinerarios.response.form.GeneralResponseForm;
 import com.itinerarios.springboot.utils.ConstantsUtil;
+import com.itinerarios.springboot.utils.JWTUtils;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -56,6 +58,25 @@ public class UsuarioController {
 
 		Request request = new Request.Builder().url("https://ssoia.herokuapp.com/Login").method("POST", body)
 				.addHeader("x-api-key", ConstantsUtil.API_KEY)
+				.addHeader("Content-Type", "application/json").build();
+		Response response = client.newCall(request).execute();
+		return response.body().string();
+
+	}
+	
+	@GetMapping(value = "/verificar", consumes = "application/json", produces = "application/json")
+	public boolean verificarToken(@RequestHeader("token") String token) throws IOException {
+		return JWTUtils.verificarToken(token);
+	}
+	
+	@GetMapping(value = "/refrescar", consumes = "application/json", produces = "application/json")
+	public String refrescarUsuario(@RequestHeader("token") String token) throws IOException {
+		
+		OkHttpClient client = new OkHttpClient().newBuilder().build();
+		
+		Request request = new Request.Builder().url("https://ssoia.herokuapp.com/JWT/refresh").method("GET",null)
+				.addHeader("x-api-key", ConstantsUtil.API_KEY)
+				.addHeader("Authorization",token.substring(7))
 				.addHeader("Content-Type", "application/json").build();
 		Response response = client.newCall(request).execute();
 		return response.body().string();

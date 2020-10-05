@@ -1,10 +1,6 @@
 package com.itinerarios.request.form;
 
 import java.util.HashMap;
-import java.util.List;
-
-import com.itinerarios.dto.ClaseVueloDTO;
-import com.itinerarios.dto.RecurrenciaVueloDTO;
 
 public class UsuarioReqCrearForm extends GeneralReqForm {
 
