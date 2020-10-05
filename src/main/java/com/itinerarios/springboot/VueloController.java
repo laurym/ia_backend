@@ -208,7 +208,8 @@ public class VueloController {
 						 + " codigoAeropuertoOrigen (obligatorio), codigoAreopuertoDestino (obligatorio), "
 						 + " fechaInicio tiene que tener el formato dd/MM/YYYY, "
 	 					 + " cantidadPasajerosAdultos, cantidadPasajerosMenores, codigoClase"
-	 					 + " Ejemplo : URLBASE/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
+	 					 + "   **************************************************************  "
+	 					 + " Ejemplo : URLBASE/itinerarios/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
 	public List<VueloDTO> obtenerVuelos(@RequestParam(name="codigoAeropuertoOrigen", required = true) String codigoAeropuertoOrigen,
 										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
 										@RequestParam Map<String,String> vueloReqMap){//@RequestParam VueloReqForm vueloReqForm) {
