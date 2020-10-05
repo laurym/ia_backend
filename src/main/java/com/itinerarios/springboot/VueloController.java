@@ -318,7 +318,7 @@ public class VueloController {
 				}
 				valorTotal = precio
 								* (vueloReqForm.getCantidadPasajerosAdultos() + vueloReqForm.getCantidadPasajerosMenores()
-								* (dto.getAerolinea().getPorcentajeDescuentoMenores() / 100));
+								* (Double.valueOf(dto.getAerolinea().getPorcentajeDescuentoMenores()) / 100D));
 				dto.setValorTotal(valorTotal);
 				SimpleDateFormat formatter2 = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA_CON_HORA);
 				Date fechaInicio = formatter2.parse(dto.getFechaPartida() + " " + dto.getHoraPartida());
