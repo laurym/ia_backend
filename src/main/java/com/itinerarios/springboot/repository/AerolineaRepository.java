@@ -14,5 +14,8 @@ public interface AerolineaRepository extends CrudRepository<Aerolinea, Long> {
 
 	@Query("from Aerolinea where codigoAerolinea = :codigoAerolinea ")
 	public Aerolinea find(@Param("codigoAerolinea") String codigoAerolinea);
-
+	
+	@Query("from Aerolinea where nombreAerolinea = :nombreAerolinea ")
+	public Aerolinea findByNombre(@Param("nombreAerolinea") String nombreAerolinea);
+	
 }
