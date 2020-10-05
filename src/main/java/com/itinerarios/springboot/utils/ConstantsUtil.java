@@ -15,6 +15,14 @@ public class ConstantsUtil {
 	public static Long CANTIDAD_PASAJEROS_DEFAULT=1L;
 	public static Long MULTIPLIER_MINUTE = 60000L;
 	
+	public static String MAP_KEY_FECHA_INICIO ="fechaInicio";
+	public static String MAP_KEY_CODIGO_AEROPUERTO_ORIGEN ="codigoAeropuertoOrigen";
+	public static String MAP_KEY_CODIGO_AEROPUERTO_DESTINO ="codigoAeropuertoDestino";
+	public static String MAP_KEY_CANT_PASAJEROS_ADULTOS="cantidadPasajerosAdultos";
+	public static String MAP_KEY_CANT_PASAJEROS_MENORES="cantidadPasajerosMenores";
+	public static String MAP_KEY_CODIGO_CLASE="codigoClase";
+	
+	
 //	x-api-key = tenant 
 //	para desencriptar un token , se usa el secreto "public_token"
 //	que es la clave publica que nos pasaron tambien fija

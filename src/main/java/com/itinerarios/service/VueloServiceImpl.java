@@ -56,23 +56,23 @@ public class VueloServiceImpl {
 		return claseVueloRepository;
 	}
 
-	public Aeropuerto findByAcronimo (String acronimo) {
+	public Aeropuerto buscarPorAcronimo (String acronimo) {
 		
 		return getAeropuertoRepository().findByAcronimo(acronimo);
 	}
 	
-	public Iterable<Vuelo> findAllVuelos() {
+	public Iterable<Vuelo> buscarVuelos() {
 		
 		return getVueloRepository().findAll();
 	}
 	
-	public Iterable<Vuelo> findAvailableFlights(String airportOrigin, String airportDest, Long asientosDisponibles,String date, String tipoClase) throws  ExceptionServiceGeneral{
+	public Iterable<Vuelo> buscarVuelosDisponibles(String airportOrigin, String airportDest, Long asientosDisponibles,String date, String tipoClase) throws  ExceptionServiceGeneral{
 		String mensajeError=null;
 		Iterable<Vuelo> vuelos = null;
 		try {
 			if (!airportOrigin.toUpperCase().equals(airportDest.toUpperCase())) {
-				Aeropuerto origin = findByAcronimo(airportOrigin.toUpperCase());
-				Aeropuerto destination = findByAcronimo(airportDest.toUpperCase());
+				Aeropuerto origin = buscarPorAcronimo(airportOrigin.toUpperCase());
+				Aeropuerto destination = buscarPorAcronimo(airportDest.toUpperCase());
 //				if (date == null || date.isEmpty() && tipoClase ==null || tipoClase.isEmpty())
 //					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestino(origin.getId(), destination.getId(), asientosDisponibles);
 				
@@ -125,7 +125,11 @@ public class VueloServiceImpl {
 		getAerolineaRepository().save(entity.getAerolinea());
 	}
 	
-	public Aerolinea findAerolinea(String codigoAerolinea) {
+	public Aerolinea buscarAerolinea(String codigoAerolinea) {
 		return getAerolineaRepository().find(codigoAerolinea);
+	}
+	
+	public Vuelo buscarVueloPorCodigo(String codigo){
+		return getVueloRepository().findByCodigo(codigo);
 	}
 }

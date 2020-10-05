@@ -17,7 +17,9 @@ public interface VueloRepository extends CrudRepository<Vuelo, String> , VueloRe
 //	@Query("select v from Vuelo v where v.aeropuerto.id = :aeropuerto and v.aeropuertoDestino.id = :aeropuertoDestino and v.clases.codigoClase = :tipoClase  order by v.fechaPartida asc, v.horaPartida asc ")
 //	Iterable<Vuelo> findByAeropuertoAeropuertoDestinoClase(Long aeropuerto, Long aeropuertoDestino, String tipoClase);
 		
-
+	@Query("from Vuelo v where v.codigo = :codigo")
+	Vuelo findByCodigo(String codigo);
+	
 	@Query("select v from Vuelo v where v.aeropuerto.id = :aeropuerto and v.aeropuertoDestino.id = :aeropuertoDestino and v.fechaPartida= :date order by v.horaPartida asc")
 	Iterable<Vuelo> buscarPorAeropuertoAeropuertoDestinoFecha(Long aeropuerto, Long aeropuertoDestino, String date);
 

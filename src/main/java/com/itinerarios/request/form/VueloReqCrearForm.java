@@ -2,12 +2,11 @@ package com.itinerarios.request.form;
 
 import java.util.List;
 
-import com.itinerarios.dto.ClaseVueloDTO;
 import com.itinerarios.dto.RecurrenciaVueloDTO;
 
 public class VueloReqCrearForm extends GeneralReqForm {
 
-	private String codigo;
+//	private String codigo;
 	private String fechaInicio;
 	private String horaInicio;
 	private String duracion;
@@ -15,20 +14,12 @@ public class VueloReqCrearForm extends GeneralReqForm {
 	private String codigoAeropuertoOrigen;
 	private String codigoAeropuertoDestino;
 	
-	private List<ClaseVueloDTO> clasesPorVueloList;
+	private List<ClaseVueloFormDTO> clasesPorVueloList;
 	private Boolean isDisponible;
 	private String aerolineaCodigo;
 	private String porcentajeDescuentoMenor;
 	
 	private RecurrenciaVueloDTO recurrencia;
-	
-	public String getCodigo() {
-		return codigo;
-	}
-
-	public void setCodigo(String codigo) {
-		this.codigo = codigo;
-	}
 
 	public String getFechaInicio() {
 		return fechaInicio;
@@ -74,11 +65,11 @@ public class VueloReqCrearForm extends GeneralReqForm {
 		this.codigoAeropuertoDestino = codigoAeropuertoDestino;
 	}
 
-	public List<ClaseVueloDTO> getClasesPorVueloList() {
+	public List<ClaseVueloFormDTO> getClasesPorVueloList() {
 		return clasesPorVueloList;
 	}
 
-	public void setClasesPorVueloList(List<ClaseVueloDTO> clasesPorVueloList) {
+	public void setClasesPorVueloList(List<ClaseVueloFormDTO> clasesPorVueloList) {
 		this.clasesPorVueloList = clasesPorVueloList;
 	}
 

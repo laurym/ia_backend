@@ -1,30 +1,17 @@
-package com.itinerarios.dto;
+package com.itinerarios.request.form;
 
-public class ClaseVueloDTO {
-//	 {
-//			"tipoClase" (Economica , Premium Economy ,Ejecutiva, Primera)
-//			"asientosDisponibles"
-//			"precioClase"
-//		  }
+public class ClaseVueloFormDTO {
 
-	private Long id;
-	private TipoClaseDTO codigoClase;
+	private String codigoClase;
 	private Long asientosClaseDisponibles;
 	private Double precio;
 	
-	public Long getId() {
-		return id;
-	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public TipoClaseDTO getClase() {
+	public String getCodigoClase() {
 		return codigoClase;
 	}
 
-	public void setClase(TipoClaseDTO clase) {
+	public void setCodigoClase(String clase) {
 		this.codigoClase = clase;
 	}
 
