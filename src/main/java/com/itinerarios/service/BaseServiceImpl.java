@@ -37,5 +37,9 @@ public class BaseServiceImpl {
 	public Aerolinea save(Aerolinea entity) {
 		return aerolineaRepository.save(entity);
 	}
+	
+	public Aerolinea aerolineaByNombre(String nombreAerolinea) {
+		return aerolineaRepository.findByNombre(nombreAerolinea);
+	}
 
 }

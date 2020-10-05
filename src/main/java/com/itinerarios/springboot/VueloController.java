@@ -1,5 +1,6 @@
 package com.itinerarios.springboot;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -20,29 +21,35 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.itinerarios.dto.AerolineaDTO;
 import com.itinerarios.dto.AeropuertoDTO;
 import com.itinerarios.dto.ClaseVueloDTO;
 import com.itinerarios.dto.TipoClaseDTO;
 import com.itinerarios.dto.VueloDTO;
+import com.itinerarios.entity.Aerolinea;
 import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.Vuelo;
 import com.itinerarios.exceptions.ExceptionServiceGeneral;
 import com.itinerarios.request.form.ClaseVueloFormDTO;
+import com.itinerarios.request.form.UsuarioReqInfoForm;
 import com.itinerarios.request.form.VueloReqCrearForm;
 import com.itinerarios.request.form.VueloReqForm;
 import com.itinerarios.response.form.GeneralResponseForm;
 import com.itinerarios.response.form.VueloResponseForm;
+import com.itinerarios.service.BaseServiceImpl;
 import com.itinerarios.service.VueloServiceImpl;
 import com.itinerarios.springboot.utils.ConstantsUtil;
 import com.itinerarios.springboot.utils.DTOUtils;
+import com.itinerarios.springboot.utils.UsuarioUtils;
 
-import antlr.StringUtils;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
@@ -53,10 +60,20 @@ public class VueloController {
 
 	@Autowired
 	private VueloServiceImpl vueloService;
+	
+	@Autowired
+	private BaseServiceImpl baseService;
 
 	@PostMapping(value = "/crearVuelo", consumes = "application/json", produces = "application/json")
-	public GeneralResponseForm crearVuelo(@RequestBody VueloReqCrearForm vueloReqForm) {
+	public GeneralResponseForm crearVuelo(@RequestBody VueloReqCrearForm vueloReqForm,
+			@RequestHeader("token") String token) throws JsonMappingException, JsonProcessingException, IOException {
+		
 		LOG.info("***** Inicio  crearVuelo *****");
+		
+		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
+		Aerolinea aerolinea = baseService.aerolineaByNombre(usuario.getPropiedades().get("aerolinea"));
+		
+		vueloReqForm.setAerolineaCodigo(aerolinea.getCodigoAerolinea());
 
 		String mensajeError = "";
 		GeneralResponseForm formResponse = null;

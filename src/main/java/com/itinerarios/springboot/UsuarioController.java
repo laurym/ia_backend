@@ -2,10 +2,6 @@ package com.itinerarios.springboot;
 
 import java.io.IOException;
 
-import javax.xml.bind.DatatypeConverter;
-
-import org.apache.tomcat.util.json.JSONParser;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +16,6 @@ import com.itinerarios.request.form.UsuarioReqCrearForm;
 import com.itinerarios.request.form.UsuarioReqForm;
 import com.itinerarios.springboot.utils.ConstantsUtil;
 import com.itinerarios.springboot.utils.JWTUtils;
-
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
