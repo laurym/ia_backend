@@ -71,9 +71,7 @@ public class VueloController {
 		LOG.info("***** Inicio  crearVuelo *****");
 		
 		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
-		Aerolinea aerolinea = baseService.aerolineaByNombre(usuario.getPropiedades().get("aerolinea"));
-		
-		vueloReqForm.setAerolineaCodigo(aerolinea.getCodigoAerolinea());
+		vueloReqForm.setAerolineaCodigo(usuario.getPropiedades().get("aerolinea"));
 
 		String mensajeError = "";
 		GeneralResponseForm formResponse = null;
