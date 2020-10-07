@@ -142,6 +142,16 @@ public class VueloController {
 					formResponse = new GeneralResponseForm("09 - ***** PARSE ERROR ***** asientosDisponibles con error");
 					throw new ExceptionServiceGeneral(formResponse.getMensaje());
 				}
+				
+				try {
+					if (Double.valueOf(idxDTO.getPrecio()) < 0D) {
+						formResponse = new GeneralResponseForm("09 - ***** PARSE ERROR ***** precio con error");
+						throw new ExceptionServiceGeneral(formResponse.getMensaje());
+					} 
+				} catch (NumberFormatException e) {
+					formResponse = new GeneralResponseForm("09 - ***** PARSE ERROR ***** precio con error");
+					throw new ExceptionServiceGeneral(formResponse.getMensaje());
+				}
 			}
 		}
 		
