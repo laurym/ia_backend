@@ -134,13 +134,12 @@ public class VueloController {
 		} else {
 			for (ClaseVueloFormDTO idxDTO : vueloReqForm.getClasesPorVueloList()) {
 				try {
-					if (Long.valueOf(idxDTO.getAsientosClaseDisponibles()) <= 0L) {
+					if (Long.valueOf(idxDTO.getAsientosClaseDisponibles()) < 0L) {
 						formResponse = new GeneralResponseForm("09 - ***** PARSE ERROR ***** asientosDisponibles con error");
 						throw new ExceptionServiceGeneral(formResponse.getMensaje());
 					} 
 				} catch (NumberFormatException e) {
-					formResponse = new GeneralResponseForm(
-							"09 - ***** PARSE ERROR ***** asientosDisponibles con error");
+					formResponse = new GeneralResponseForm("09 - ***** PARSE ERROR ***** asientosDisponibles con error");
 					throw new ExceptionServiceGeneral(formResponse.getMensaje());
 				}
 			}
