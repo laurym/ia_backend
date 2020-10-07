@@ -34,7 +34,6 @@ import com.itinerarios.dto.AeropuertoDTO;
 import com.itinerarios.dto.ClaseVueloDTO;
 import com.itinerarios.dto.TipoClaseDTO;
 import com.itinerarios.dto.VueloDTO;
-import com.itinerarios.entity.Aerolinea;
 import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.Vuelo;
 import com.itinerarios.exceptions.ExceptionServiceGeneral;
@@ -75,7 +74,6 @@ public class VueloController {
 
 		String mensajeError = "";
 		GeneralResponseForm formResponse = null;
-//		String pattern = "dd-MM-yyyy HH:mm:ss";
 		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA_CON_HORA);
 
 		Date fechaInicio;
