@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,18 +24,19 @@ import com.itinerarios.dto.AeropuertoDTO;
 import com.itinerarios.dto.TipoClaseDTO;
 import com.itinerarios.entity.Aerolinea;
 import com.itinerarios.entity.Aeropuerto;
-import com.itinerarios.entity.Greeting;
 import com.itinerarios.entity.TipoClase;
 import com.itinerarios.service.BaseServiceImpl;
 import com.itinerarios.springboot.utils.DTOUtils;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 
 
 @RestController
 @CrossOrigin(origins="*", methods= {RequestMethod.GET,RequestMethod.POST})
-@RequestMapping(value= "rest")//, consumes = MediaType.APPLICATION_JSON_VALUE, 
-//produces = MediaType.APPLICATION_JSON_VALUE,
-//method = {RequestMethod.GET})
+@RequestMapping(value= "")
+@Api(tags  = "baseAPI")
 public class BaseController {
 
 	@Autowired 
@@ -46,15 +46,8 @@ public class BaseController {
 	private final AtomicLong counter = new AtomicLong();
 	Logger LOG = LogManager.getLogger(BaseController.class);
 	
-//	@Autowired 
-	@GetMapping("/greeting")
-	public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
-		LOG.info("***** Inicio  greeting *****");
-		LOG.info("***** Fin  greeting *****");
-		return new Greeting(counter.incrementAndGet(), String.format(template, name));
-	}
-	
 	@GetMapping("/aeropuertos")
+	@ApiOperation(value = "Método para obtener los areopuertos", notes = "Retorna todos los aeropuertos disponibles")
 	public List<AeropuertoDTO> obtenerAeropuertos() {
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
 		Iterable<Aeropuerto> itObj = baseService.findAllAeropuertos();
@@ -74,6 +67,7 @@ public class BaseController {
 	
 	
 	@GetMapping("/aerolineas" )
+	@ApiOperation(value = "Método para obtener las aerolíneas", notes = "Retorna todas las aerolíneas disponibles")
 	public @ResponseBody List<AerolineaDTO> obtenerAerolineas() {
 		LOG.info("***** Inicio  obtenerAerolineas *****");
 	    // This returns a JSON or XML with the users
@@ -95,6 +89,7 @@ public class BaseController {
 	@PostMapping(value = "/guardarAerolineas", consumes = "application/json", produces = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
+    @ApiOperation(value = "Método para guardar la aerolínea", notes = "Retorna la aerolínea")
 	public AerolineaDTO guardarAerolineas(@RequestBody AerolineaDTO aerolineaDTO) {
 		LOG.info("***** Inicio  guardarAerolineas *****");
 		// user here is a prepopulated User instance
@@ -107,6 +102,7 @@ public class BaseController {
 	}
 	
 	@GetMapping("/clases")
+	@ApiOperation(value = "Método para obtener las clases de vuelos", notes = "Retorna todas las clases disponibles")
 	public List<TipoClaseDTO> obtenerClases(){ 
 		LOG.info("***** Inicio  obtenerClases *****");
 		Iterable<TipoClase> itObj = baseService.findAllTiposClase();

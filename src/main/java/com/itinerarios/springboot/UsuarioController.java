@@ -16,6 +16,9 @@ import com.itinerarios.request.form.UsuarioReqCrearForm;
 import com.itinerarios.request.form.UsuarioReqForm;
 import com.itinerarios.springboot.utils.ConstantsUtil;
 import com.itinerarios.springboot.utils.JWTUtils;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -23,10 +26,12 @@ import okhttp3.Response;
 
 @RestController
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST })
-@RequestMapping("rest/usuarios")
+@RequestMapping("usuarios")
+@Api(tags  = "usuariosAPI")
 public class UsuarioController {
 	
 	@PostMapping(value = "/registrar", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Método para registrar el usuario. Interactua con el api de SSO ", notes = "Retorna el token obtenido")
 	public String registrarUsuario(@RequestBody UsuarioReqCrearForm usuario) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		String bodyString = mapper.writeValueAsString(usuario);
@@ -43,6 +48,7 @@ public class UsuarioController {
 
 	}
 	@PostMapping(value = "/logear", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Método para logear el usuario. Interactua con el api de SSO ")
 	public String logearUsuario(@RequestBody UsuarioReqForm usuario) throws IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		String bodyString = mapper.writeValueAsString(usuario);
@@ -60,11 +66,13 @@ public class UsuarioController {
 	}
 	
 	@GetMapping(value = "/verificar", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Método para verificar el token. Interactua con el api de SSO. Retorna si el token es válido o no")
 	public boolean verificarToken(@RequestHeader("token") String token) throws IOException {
 		return JWTUtils.verificarToken(token);
 	}
 	
 	@GetMapping(value = "/refrescar", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Método para realizar refresh del token asociado al usuario. Interactua con el api de SSO ", notes = "Refresca el token obtenido")
 	public String refrescarUsuario(@RequestHeader("token") String token) throws IOException {
 		
 		OkHttpClient client = new OkHttpClient().newBuilder().build();

@@ -43,27 +43,29 @@ import com.itinerarios.request.form.VueloReqCrearForm;
 import com.itinerarios.request.form.VueloReqForm;
 import com.itinerarios.response.form.GeneralResponseForm;
 import com.itinerarios.response.form.VueloResponseForm;
-import com.itinerarios.service.BaseServiceImpl;
 import com.itinerarios.service.VueloServiceImpl;
 import com.itinerarios.springboot.utils.ConstantsUtil;
 import com.itinerarios.springboot.utils.DTOUtils;
 import com.itinerarios.springboot.utils.UsuarioUtils;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
 @CrossOrigin(origins="*", methods = { RequestMethod.GET, RequestMethod.POST })
-@RequestMapping("rest/vuelos")
+@RequestMapping("vuelos")
+@Api(tags  = "vuelosAPI")
 public class VueloController {
 	Logger LOG = LogManager.getLogger(VueloController.class);
 
 	@Autowired
 	private VueloServiceImpl vueloService;
 	
-	@Autowired
-	private BaseServiceImpl baseService;
-
 	@PostMapping(value = "/crearVuelo", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Método para crear los vuelos según los parametros ingresados y el usuario de token informado", 
+				  notes = "En el caso de error se muestra el mensaje correspondiente de error al ingreso de datos."
+						  + "	Se retorna el mensaje de OK ante un alta saitsfactorio.")
+		
 	public GeneralResponseForm crearVuelo(@RequestBody VueloReqCrearForm vueloReqForm,
 			@RequestHeader("token") String token) throws JsonMappingException, JsonProcessingException, IOException {
 		
@@ -231,7 +233,10 @@ public class VueloController {
 						 + " fechaInicio tiene que tener el formato dd/MM/YYYY, "
 	 					 + " cantidadPasajerosAdultos, cantidadPasajerosMenores, codigoClase"
 	 					 + "   **************************************************************  "
-	 					 + " Ejemplo : URLBASE/itinerarios/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
+	 					+ "   **************************************************************  "
+	 					 + " Ejemplo : URLBASE/itinerarios/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1",
+	 					 
+				notes= "Ante un error en la respuesta en los datos de entrada se retorna el error 409.")
 	public List<VueloDTO> obtenerVuelos(@RequestParam(name="codigoAeropuertoOrigen", required = true) String codigoAeropuertoOrigen,
 										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
 										@RequestParam Map<String,String> vueloReqMap){//@RequestParam VueloReqForm vueloReqForm) {
@@ -242,6 +247,7 @@ public class VueloController {
 		String mensajeError = "";
 		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA);
 
+		@SuppressWarnings("unused")
 		Date travelDate = null;
 		VueloReqForm vueloReqForm = null;
 		List<VueloDTO> listDTO = new ArrayList<VueloDTO>();
