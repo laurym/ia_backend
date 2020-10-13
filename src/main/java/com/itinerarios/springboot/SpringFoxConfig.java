@@ -29,8 +29,11 @@ public class SpringFoxConfig {
 	// 	Describe your apis
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder().title("Gestión de itinerarios API")
-				.description("Esta página lista todos los endpoints que disponibiliza gestión de itinerarios.").version("1.0-SNAPSHOT")
-				.build();
+				.description("Esta página lista todos los endpoints que disponibiliza gestión de itinerarios.	"
+						+ " \n\n LISTA DE CAMBIOS  "
+						+ "  \n\n 13-10-2020 : Agregado de comentarios en swagger."
+						+ "  \n\n 13-10-2020 : Cambio de url. Se eliminó el /rest de los endpoints. Tener en cuenta esto al consumir la API."
+						+ "	").version("1.0-SNAPSHOT").build();
 	}
 
 }
