@@ -33,6 +33,7 @@ public class SpringFoxConfig {
 						+ " \n\n LISTA DE CAMBIOS  "
 						+ "  \n\n 13-10-2020 : Agregado de comentarios en swagger."
 						+ "  \n\n 13-10-2020 : Cambio de url. Se eliminó el /rest de los endpoints. Tener en cuenta esto al consumir la API."
+						+ "  \n\n 22-10-2020 : Contrato de confirmarVuelo. Para verificaciòn. Implementacion no completa."
 						+ "	").version("1.0-SNAPSHOT").build();
 	}
 

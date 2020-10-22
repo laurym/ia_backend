@@ -227,6 +227,64 @@ public class VueloController {
 		return formResponse;
 	}
 
+	@PostMapping(value = "/confirmarVuelo", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Método para confirmar el vuelo seleccionado según los parametros ingresados y el usuario de token informado", 
+				  notes = "En el caso de error se muestra el mensaje correspondiente de error al ingreso de datos."
+						  + "	Se retorna el mensaje de OK ante una confirmacion exitosa.")
+		
+	public GeneralResponseForm confirmarVuelo(@RequestParam(name="codigoVuelo", required = true) String codigoVuelo,
+			@RequestParam(name="codigoClase", required = true) String codigoClase,
+			@RequestParam(name="cantidadPasajeros", required = true ) Long cantidadPasajeros,
+			@RequestHeader("token") String token) throws JsonMappingException, JsonProcessingException, IOException {
+		
+		LOG.info("***** Inicio  confirmarVuelo *****");
+		
+		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
+		String mensajeError = "";
+		GeneralResponseForm formResponse = null;
+		VueloDTO vueloDTO = new VueloDTO();
+		Boolean encontrado = Boolean.FALSE;
+		try {
+			if (Long.valueOf(cantidadPasajeros) < 0L) {
+				formResponse = new GeneralResponseForm("07 - ***** PARSE ERROR ***** cantidadPasajeros con error");
+				throw new ExceptionServiceGeneral(formResponse.getMensaje());
+			}
+		} catch (NumberFormatException e) {
+			formResponse = new GeneralResponseForm("07 - ***** PARSE ERROR ***** cantidadPasajeros con error");
+			throw new ExceptionServiceGeneral(formResponse.getMensaje());
+		}
+
+		try {
+				Vuelo vuelo = vueloService.buscarVueloPorCodigo(codigoVuelo);
+				vueloDTO = DTOUtils.convertToDto(vuelo);
+		} catch (RuntimeException e) {
+			mensajeError = "04 -  ****** PARSE ERROR ****** aeropuertos con error - " + codigoVuelo;
+			throw new ExceptionServiceGeneral(mensajeError);
+		}
+
+		Iterator <ClaseVueloDTO> iterator = vueloDTO.getClases().iterator();
+		Long asientosDisponiblesTotal = 0L;
+		while (iterator.hasNext()) {
+			ClaseVueloDTO idxDTO = iterator.next();
+			if(codigoClase.compareTo(idxDTO.getClase().getCodigoClase()) ==0 && (idxDTO.getAsientosClaseDisponibles().compareTo(cantidadPasajeros) >=0  )) {
+				encontrado = Boolean.TRUE;
+				break;
+			}
+		}
+		
+		if (encontrado) {
+			
+//			vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
+		}
+
+		LOG.info("***** Fin  confirmarVuelo *****");
+		if (mensajeError == null || mensajeError.isEmpty()) {
+			mensajeError = "OK";
+		}
+		formResponse = new GeneralResponseForm(mensajeError);
+		return formResponse;
+	}
+	
 	@GetMapping("/busqueda")
 	@ApiOperation(value = "Los parámetros a enviar son los siguientes :"
 						 + " codigoAeropuertoOrigen (obligatorio), codigoAreopuertoDestino (obligatorio), "

@@ -31,6 +31,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 					    				+  " vuelo.aeropuertoDestino.id = :aeropuertoDestino"
 					    				+  " and vuelo.fechaPartida = :date "
 					    				+  " and claseVuelo.codigoClase.codigoClase = :tipoClase "
+					    				+  " and vuelo.disponible = :disponible "
 					    				+  " and claseVuelo.asientosClaseDisponibles >= :asientosClase "
 					    				+  " order by vuelo.horaPartida asc";
 	    	Query query = entityManager.createQuery(consultaPorVuelos);
@@ -40,6 +41,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 	    	query.setParameter("date", date);
 	    	query.setParameter("tipoClase", tipoClase);
 	    	query.setParameter("asientosClase", asientosDisponibles);
+	    	query.setParameter("disponible", true);
 	    	
 	    	List<Object[]> vuelosBase  = query.getResultList();
 	    	List<Vuelo> vuelosReturn = new ArrayList<Vuelo>();
@@ -71,13 +73,14 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 									+  " and claseVuelo.codigoClase.codigoClase = :tipoClase "
 				    				+  " and claseVuelo.asientosClaseDisponibles >= :asientosClase "
 									+  " and vuelo.fechaPartida >=  :fecha "
+				    				+  " and vuelo.disponible = :disponible "
 									+ " ORDER by vuelo.fechaPartida asc, vuelo.horaPartida asc";
 			
 			Query query = entityManager.createQuery(consultaPorVuelos);
 			query.setParameter("aeropuerto", aeropuerto);
 	    	query.setParameter("aeropuertoDestino", aeropuertoDestino);
 	    	query.setParameter("tipoClase", tipoClase);
-	    	
+	    	query.setParameter("disponible", true);
 	    	LocalDate today = LocalDate.now();
     	   	String formattedDate = today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 	    	query.setParameter("fecha", "\'"+formattedDate+"\'");

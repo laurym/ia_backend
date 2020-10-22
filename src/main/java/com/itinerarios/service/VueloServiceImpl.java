@@ -81,9 +81,10 @@ public class VueloServiceImpl {
 //					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoFecha(origin.getId(), destination.getId(), asientosDisponibles , date);
 				
 //				else
-					if ((date == null || date.isEmpty()) && (tipoClase !=null &&  !tipoClase.isEmpty()))
-					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoClase(origin.getId(), destination.getId(), asientosDisponibles, tipoClase);
-				
+				if ((date == null || date.isEmpty()) && (tipoClase != null && !tipoClase.isEmpty()))
+					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoClase(origin.getId(),
+							destination.getId(), asientosDisponibles, tipoClase);
+
 				else
 					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoFechaClase(origin.getId(), destination.getId(), asientosDisponibles, date, tipoClase);
 					
@@ -132,4 +133,5 @@ public class VueloServiceImpl {
 	public Vuelo buscarVueloPorCodigo(String codigo){
 		return getVueloRepository().findByCodigo(codigo);
 	}
+	
 }
