@@ -238,7 +238,7 @@ public class VueloController {
 		
 		LOG.info("***** Inicio  confirmarVuelo *****");
 		
-//		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
+		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
 		String mensajeError = "";
 		GeneralResponseForm formResponse = null;
 		VueloDTO vueloDTO = new VueloDTO();
