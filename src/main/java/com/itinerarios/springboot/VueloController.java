@@ -202,6 +202,7 @@ public class VueloController {
 				tipoDTO.setCodigoClase(claseDTO.getCodigoClase());
 				claseVueloDTO.setClase(tipoDTO);
 				claseVueloDTO.setAsientosClaseDisponibles(claseDTO.getAsientosClaseDisponibles());
+				claseVueloDTO.setAsientosVendidos(0L);
 				claseVueloDTO.setPrecio(claseDTO.getPrecio());
 				setVuelosDTO.add(claseVueloDTO);
 			}
@@ -264,17 +265,22 @@ public class VueloController {
 
 		Iterator <ClaseVueloDTO> iterator = vueloDTO.getClases().iterator();
 		String codigoClase = vueloReqForm.getCodigoClase();
+		Long valorProbable = 0L;
 		while (iterator.hasNext()) {
 			ClaseVueloDTO idxDTO = iterator.next();
-			if(codigoClase.compareTo(idxDTO.getClase().getCodigoClase()) ==0 && (idxDTO.getAsientosClaseDisponibles().compareTo(cantidadPasajeros) >=0  )) {
+			valorProbable = idxDTO.getAsientosVendidos() + cantidadPasajeros;
+			if(codigoClase.compareTo(idxDTO.getClase().getCodigoClase()) ==0
+				&& (valorProbable.compareTo(idxDTO.getAsientosClaseDisponibles()) >=0  )) {
 				encontrado = Boolean.TRUE;
+				idxDTO.setAsientosVendidos(valorProbable);
 				break;
 			}
 		}
 		
 		if (encontrado) {
-			
-//			vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
+			vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
+		}	else {
+			mensajeError = "No se pudo completar la operación.";
 		}
 
 		LOG.info("***** Fin  confirmarVuelo *****");
@@ -284,7 +290,7 @@ public class VueloController {
 		formResponse = new GeneralResponseForm(mensajeError);
 		return formResponse;
 	}
-	
+		
 	@GetMapping("/busqueda")
 	@ApiOperation(value = "Los parámetros a enviar son los siguientes :"
 						 + " codigoAeropuertoOrigen (obligatorio), codigoAreopuertoDestino (obligatorio), "

@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -37,6 +38,8 @@ public class ClaseVuelo {
 	private TipoClase codigoClase;
 	
 	private Long asientosClaseDisponibles;
+	
+	private Long asientosVendidos; 
 	
 	private Double precio;
 
@@ -70,6 +73,14 @@ public class ClaseVuelo {
 
 	public void setAsientosClaseDisponibles(Long asientosDisponibles) {
 		this.asientosClaseDisponibles = asientosDisponibles;
+	}
+
+	public Long getAsientosVendidos() {
+		return asientosVendidos;
+	}
+
+	public void setAsientosVendidos(Long asientosVendidos) {
+		this.asientosVendidos = asientosVendidos;
 	}
 
 	public Double getPrecio() {

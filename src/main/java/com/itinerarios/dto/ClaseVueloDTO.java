@@ -10,6 +10,7 @@ public class ClaseVueloDTO {
 	private Long id;
 	private TipoClaseDTO codigoClase;
 	private Long asientosClaseDisponibles;
+	private Long asientosVendidos;
 	private Double precio;
 	
 	public Long getId() {
@@ -34,6 +35,14 @@ public class ClaseVueloDTO {
 
 	public void setAsientosClaseDisponibles(Long asientosDisponibles) {
 		this.asientosClaseDisponibles = asientosDisponibles;
+	}
+
+	public Long getAsientosVendidos() {
+		return asientosVendidos;
+	}
+
+	public void setAsientosVendidos(Long asientosVendidos) {
+		this.asientosVendidos = asientosVendidos;
 	}
 
 	public Double getPrecio() {
