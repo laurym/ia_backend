@@ -259,7 +259,7 @@ public class VueloController {
 			vueloDTO.setAerolinea(aerolineaDTO);
 			
 			codigoRecurrente = vueloDTO.getCodigo();
-//			vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
+			vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
 		}
 		LOG.info("***** Fin  crearVuelo *****");
 		if (mensajeError == null || mensajeError.isEmpty()) {
@@ -476,7 +476,7 @@ public class VueloController {
 			String codigoVuelo) {
 
 		String valorCodigo = "";
-		if (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.UNICO) == 0) {
+		if (vueloReqForm.getRecurrencia().getTipoRecurrencia().getValor().compareTo(TipoRecurrencia.UNICO.getValor()) == 0) {
 			valorCodigo = getCodigoVuelo(vueloReqForm, aerolineaDTO);
 		} else {
 			if (j <= ConstantsUtil.repeticiones.length) {
