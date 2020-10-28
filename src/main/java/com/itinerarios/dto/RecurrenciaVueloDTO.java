@@ -1,15 +1,17 @@
 package com.itinerarios.dto;
 
+import com.itinerarios.enums.TipoRecurrencia;
+
 public class RecurrenciaVueloDTO {
 
-	private String tipoRecurrencia;
+	private TipoRecurrencia tipoRecurrencia;
 	private Long cantidadRecurrencia;
 
-	public String getTipoRecurrencia() {
+	public TipoRecurrencia getTipoRecurrencia() {
 		return tipoRecurrencia;
 	}
 
-	public void setTipoRecurrencia(String tipoRecurrencia) {
+	public void setTipoRecurrencia(TipoRecurrencia tipoRecurrencia) {
 		this.tipoRecurrencia = tipoRecurrencia;
 	}
 

@@ -1,6 +1,8 @@
 package com.itinerarios.enums;
 public enum TipoClase {
-	ECONOMICA("YC", "Económica"), PREMIUM("PE", "Premium Economy"), EJECUTIVA("C", "Ejecutiva"),
+	ECONOMICA("YC", "Económica"), 
+	PREMIUM("PE", "Premium Economy"), 
+	EJECUTIVA("C", "Ejecutiva"),
 //	(Economica , Premium Economy ,Ejecutiva, Primera)
 	PRIMERA("F", "Primera");
 	

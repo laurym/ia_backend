@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -32,10 +36,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.itinerarios.dto.AerolineaDTO;
 import com.itinerarios.dto.AeropuertoDTO;
 import com.itinerarios.dto.ClaseVueloDTO;
+import com.itinerarios.dto.RecurrenciaVueloDTO;
 import com.itinerarios.dto.TipoClaseDTO;
 import com.itinerarios.dto.VueloDTO;
 import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.Vuelo;
+import com.itinerarios.enums.TipoRecurrencia;
 import com.itinerarios.exceptions.ExceptionServiceGeneral;
 import com.itinerarios.request.form.ClaseVueloFormDTO;
 import com.itinerarios.request.form.UsuarioReqInfoForm;
@@ -58,7 +64,7 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags  = "vuelosAPI")
 public class VueloController {
 	Logger LOG = LogManager.getLogger(VueloController.class);
-
+	
 	@Autowired
 	private VueloServiceImpl vueloService;
 	
@@ -179,48 +185,82 @@ public class VueloController {
 			aerolineaDTO.setPorcentajeDescuentoMenores(Long.valueOf(vueloReqForm.getPorcentajeDescuentoMenor()));
 		}
 		
-		VueloDTO vueloDTO = new VueloDTO();
 		
-		
-		vueloDTO.setCodigo(getCodigoVuelo(vueloReqForm, aerolineaDTO));
-		vueloDTO.setAeropuerto(dtoOrigen);
-		vueloDTO.setAeropuertoDestino(dtoDestino);
-		vueloDTO.setFechaPartida(vueloReqForm.getFechaInicio());
-		vueloDTO.setHoraPartida(vueloReqForm.getHoraInicio());
-		vueloDTO.setDuracion(Long.valueOf(vueloReqForm.getDuracion()));
-		vueloDTO.setDisponible(Boolean.TRUE);//vueloReqForm.getIsDisponible());
-		Set<ClaseVueloFormDTO> vuelosSet = new HashSet<ClaseVueloFormDTO>(vueloReqForm.getClasesPorVueloList());
-		Set<ClaseVueloDTO> setVuelosDTO = new HashSet<ClaseVueloDTO>();
+		if (vueloReqForm.getRecurrencia() == null ||
+				(vueloReqForm.getRecurrencia() != null
+					&& ((vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.MENSUAL) == 0 && vueloReqForm.getRecurrencia().getCantidadRecurrencia() > 12)
+						|| (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.SEMANAL) == 0 && vueloReqForm.getRecurrencia().getCantidadRecurrencia() > 52)))) {
+			mensajeError = "12 -  ****** RECURRENCIA ERROR ****** recurrencia con error";
+			throw new ExceptionServiceGeneral(mensajeError);
+		}
+		else if (vueloReqForm.getRecurrencia()==null){
+			RecurrenciaVueloDTO recurrenciaDTO = new RecurrenciaVueloDTO();
+			recurrenciaDTO.setTipoRecurrencia(TipoRecurrencia.UNICO);
+			recurrenciaDTO.setCantidadRecurrencia(1L);
+			
+			vueloReqForm.setRecurrencia(recurrenciaDTO);
+		}
+		String codigoRecurrente = null;
+		for (int i = 0; i < vueloReqForm.getRecurrencia().getCantidadRecurrencia(); i++) {
+			VueloDTO vueloDTO = new VueloDTO();
 
-		Iterator<ClaseVueloFormDTO> itSet = vuelosSet.iterator();
-		
-		while (itSet.hasNext()) {
-			ClaseVueloFormDTO claseDTO = itSet.next();
-			if(claseDTO.getAsientosClaseDisponibles().compareTo(0L) != 0){
-				ClaseVueloDTO claseVueloDTO = new ClaseVueloDTO();
-				TipoClaseDTO tipoDTO = new TipoClaseDTO();
-				tipoDTO.setCodigoClase(claseDTO.getCodigoClase());
-				claseVueloDTO.setClase(tipoDTO);
-				claseVueloDTO.setAsientosClaseDisponibles(claseDTO.getAsientosClaseDisponibles());
-				claseVueloDTO.setAsientosVendidos(0L);
-				claseVueloDTO.setPrecio(claseDTO.getPrecio());
-				setVuelosDTO.add(claseVueloDTO);
+			vueloDTO.setCodigo(getCodigoVuelo(vueloReqForm, aerolineaDTO, i, codigoRecurrente));
+			System.out.println(i  + "  codigo Vuelo : " + vueloDTO.getCodigo());
+			vueloDTO.setAeropuerto(dtoOrigen);
+			vueloDTO.setAeropuertoDestino(dtoDestino);
+			DateTimeFormatter formatterDT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+			
+			if (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.SEMANAL) == 0) {
+				LocalDateTime today = fechaInicio.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+				LocalDateTime sigSemana = today.plus(i, ChronoUnit.WEEKS);
+				vueloDTO.setFechaPartida(formatterDT.format(sigSemana).split(" ")[0].trim());
+			
+			} else if (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.MENSUAL) == 0) {
+				LocalDateTime today = fechaInicio.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+				LocalDateTime sigMes = today.plus(i, ChronoUnit.MONTHS);
+				vueloDTO.setFechaPartida(formatterDT.format(sigMes).split(" ")[0].trim());
+			
+			} else {
+				vueloDTO.setFechaPartida(vueloReqForm.getFechaInicio());
 			}
-		}
-		
-		vueloDTO.setClases(setVuelosDTO);
-		Iterator <ClaseVueloDTO> iterator = vueloDTO.getClases().iterator();
-		Long asientosDisponiblesTotal = 0L;
-		while (iterator.hasNext()) {
-			ClaseVueloDTO idxDTO = iterator.next();
-			asientosDisponiblesTotal += idxDTO.getAsientosClaseDisponibles();		
-		}
-		
-		vueloDTO.setAsientosDisponibles(asientosDisponiblesTotal);
-		vueloDTO.setAerolinea(aerolineaDTO);
-		
-		vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
+			vueloDTO.setHoraPartida(vueloReqForm.getHoraInicio());
+			
+			
+			vueloDTO.setDuracion(Long.valueOf(vueloReqForm.getDuracion()));
+			vueloDTO.setDisponible(Boolean.TRUE);// vueloReqForm.getIsDisponible());
+			Set<ClaseVueloFormDTO> vuelosSet = new HashSet<ClaseVueloFormDTO>(vueloReqForm.getClasesPorVueloList());
+			Set<ClaseVueloDTO> setVuelosDTO = new HashSet<ClaseVueloDTO>();
 
+			Iterator<ClaseVueloFormDTO> itSet = vuelosSet.iterator();
+
+			while (itSet.hasNext()) {
+				ClaseVueloFormDTO claseDTO = itSet.next();
+				if (claseDTO.getAsientosClaseDisponibles().compareTo(0L) != 0) {
+					ClaseVueloDTO claseVueloDTO = new ClaseVueloDTO();
+					TipoClaseDTO tipoDTO = new TipoClaseDTO();
+					tipoDTO.setCodigoClase(claseDTO.getCodigoClase());
+					claseVueloDTO.setClase(tipoDTO);
+					claseVueloDTO.setAsientosClaseDisponibles(claseDTO.getAsientosClaseDisponibles());
+					claseVueloDTO.setAsientosVendidos(0L);
+					claseVueloDTO.setPrecio(claseDTO.getPrecio());
+					setVuelosDTO.add(claseVueloDTO);
+				}
+			}
+
+			vueloDTO.setClases(setVuelosDTO);
+			Iterator<ClaseVueloDTO> iterator = vueloDTO.getClases().iterator();
+			Long asientosDisponiblesTotal = 0L;
+			while (iterator.hasNext()) {
+				ClaseVueloDTO idxDTO = iterator.next();
+				asientosDisponiblesTotal += idxDTO.getAsientosClaseDisponibles();
+			}
+
+			vueloDTO.setAsientosDisponibles(asientosDisponiblesTotal);
+			vueloDTO.setAerolinea(aerolineaDTO);
+			
+			codigoRecurrente = vueloDTO.getCodigo();
+//			vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
+		}
 		LOG.info("***** Fin  crearVuelo *****");
 		if (mensajeError == null || mensajeError.isEmpty()) {
 			mensajeError = "OK";
@@ -431,6 +471,38 @@ public class VueloController {
 	    return random.longs(min,(max+1)).findFirst().getAsLong();
 	}
 	
+	private String getCodigoVuelo(VueloReqCrearForm vueloReqForm, AerolineaDTO aerolineaDTO, Integer j,
+			String codigoVuelo) {
+
+		String valorCodigo = "";
+		if (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.UNICO) == 0) {
+			valorCodigo = getCodigoVuelo(vueloReqForm, aerolineaDTO);
+		} else {
+			if (j <= ConstantsUtil.repeticiones.length) {
+				valorCodigo = codigoVuelo != null ? codigoVuelo : getCodigoVuelo(vueloReqForm, aerolineaDTO);
+				if (j >= 2) {
+					if (valorCodigo.lastIndexOf(ConstantsUtil.repeticiones[j - 2]) > 0)
+						valorCodigo = valorCodigo.substring(0,
+								valorCodigo.lastIndexOf(ConstantsUtil.repeticiones[j - 2]))
+								+ ConstantsUtil.repeticiones[j - 1];
+				} else if (j == 1) {
+					valorCodigo = valorCodigo + ConstantsUtil.repeticiones[j - 1];
+				}
+			} else {
+				Long valueModDiv = Math.floorDiv(Long.valueOf(j), 24L);
+				if (j == ConstantsUtil.repeticiones.length + 1) {
+					valorCodigo = codigoVuelo != null ? codigoVuelo.substring(0, codigoVuelo.length() - 1) : getCodigoVuelo(vueloReqForm, aerolineaDTO);
+					valorCodigo = valorCodigo + ConstantsUtil.repeticiones[j - (ConstantsUtil.repeticiones.length + 1)] + ConstantsUtil.repeticiones[valueModDiv.intValue()];
+				} else {
+					valorCodigo = codigoVuelo != null ? codigoVuelo.substring(0, codigoVuelo.length() - 1) : getCodigoVuelo(vueloReqForm, aerolineaDTO);
+					valorCodigo = valorCodigo + ConstantsUtil.repeticiones[j - ConstantsUtil.repeticiones.length];
+
+				}
+			}
+		}
+		return valorCodigo;
+	}
+
 	private String getCodigoVuelo(VueloReqCrearForm vueloReqForm, AerolineaDTO aerolineaDTO) {
 		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA);
 		String randomString = "";
@@ -461,5 +533,4 @@ public class VueloController {
 		}
 		return codigoVuelo;
 	}
-	
 }

@@ -22,7 +22,7 @@ public class ConstantsUtil {
 	public static String MAP_KEY_CANT_PASAJEROS_MENORES="cantidadPasajerosMenores";
 	public static String MAP_KEY_CODIGO_CLASE="codigoClase";
 	
-	
+	public static String[] repeticiones = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X", "Y","Z"};
 //	x-api-key = tenant 
 //	para desencriptar un token , se usa el secreto "public_token"
 //	que es la clave publica que nos pasaron tambien fija
