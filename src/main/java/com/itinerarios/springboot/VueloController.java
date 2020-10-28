@@ -71,7 +71,7 @@ public class VueloController {
 	@PostMapping(value = "/crearVuelo", consumes = "application/json", produces = "application/json")
 	@ApiOperation(value = "Método para crear los vuelos según los parametros ingresados y el usuario de token informado", 
 				  notes = "En el caso de error se muestra el mensaje correspondiente de error al ingreso de datos."
-						  + "	Se retorna el mensaje de OK ante un alta saitsfactorio.")
+						  + "\n\n	Se retorna el mensaje de OK ante un alta saitsfactorio.")
 		
 	public GeneralResponseForm crearVuelo(@RequestBody VueloReqCrearForm vueloReqForm,
 			@RequestHeader("token") String token) throws JsonMappingException, JsonProcessingException, IOException {
@@ -272,7 +272,8 @@ public class VueloController {
 	@PostMapping(value = "/confirmarVuelo", consumes = "application/json", produces = "application/json")
 	@ApiOperation(value = "Método para confirmar el vuelo seleccionado según los parametros ingresados y el usuario de token informado", 
 				  notes = "En el caso de error se muestra el mensaje correspondiente de error al ingreso de datos."
-						  + "	Se retorna el mensaje de OK ante una confirmacion exitosa.")
+						  + "\n\n	Se retorna el mensaje de \"OK\" ante una confirmacion exitosa."
+						  + "\n\n	Se retorna el mensaje de \"No se pudo completar la operación.\" ante una confirmacion no exitosa.")
 		
 	public GeneralResponseForm confirmarVuelo(@RequestBody  VueloReqConfirmarForm vueloReqForm,
 			@RequestHeader("token") String token) throws JsonMappingException, JsonProcessingException, IOException {
@@ -332,15 +333,15 @@ public class VueloController {
 	}
 		
 	@GetMapping("/busqueda")
-	@ApiOperation(value = "Los parámetros a enviar son los siguientes :"
-						 + " codigoAeropuertoOrigen (obligatorio), codigoAreopuertoDestino (obligatorio), "
-						 + " fechaInicio tiene que tener el formato dd/MM/YYYY, "
-	 					 + " cantidadPasajerosAdultos, cantidadPasajerosMenores, codigoClase"
-	 					 + "   **************************************************************  "
-	 					+ "   **************************************************************  "
-	 					 + " Ejemplo : URLBASE/itinerarios/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1",
+	@ApiOperation(value = "Método para realizar la búsqueda de vuelos.",
 	 					 
-				notes= "Ante un error en la respuesta en los datos de entrada se retorna el error 409.")
+				notes= "\n\n Ante un error en la respuesta en los datos de entrada se retorna el error 409."
+						+ "\n\n Los parámetros a enviar son los siguientes :"
+						 + " \n\n  codigoAeropuertoOrigen (obligatorio), codigoAreopuertoDestino (obligatorio), "
+						 + " \n\n  fechaInicio tiene que tener el formato dd/MM/YYYY, "
+						 + " \n\n  cantidadPasajerosAdultos, cantidadPasajerosMenores, codigoClase"
+						+ "  \n\n   **************************************************************  "
+						 + " \n\n  Ejemplo : URLBASE/itinerarios/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
 	public List<VueloDTO> obtenerVuelos(@RequestParam(name="codigoAeropuertoOrigen", required = true) String codigoAeropuertoOrigen,
 										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
 										@RequestParam Map<String,String> vueloReqMap){//@RequestParam VueloReqForm vueloReqForm) {
