@@ -53,6 +53,7 @@ import com.itinerarios.response.form.VueloResponseForm;
 import com.itinerarios.service.VueloServiceImpl;
 import com.itinerarios.springboot.utils.ConstantsUtil;
 import com.itinerarios.springboot.utils.DTOUtils;
+import com.itinerarios.springboot.utils.JWTUtils;
 import com.itinerarios.springboot.utils.UsuarioUtils;
 
 import io.swagger.annotations.Api;
@@ -279,10 +280,13 @@ public class VueloController {
 			@RequestHeader("token") String token) throws JsonMappingException, JsonProcessingException, IOException {
 		
 		LOG.info("***** Inicio  confirmarVuelo *****");
-		
-		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
-		String mensajeError = "";
 		GeneralResponseForm formResponse = null;
+		
+		if (!JWTUtils.verificarToken(token)) {
+			formResponse = new GeneralResponseForm("***** TOKEN ERROR ***** error al verificar token");
+			throw new ExceptionServiceGeneral(formResponse.getMensaje());
+		}
+		String mensajeError = "";
 		VueloDTO vueloDTO = new VueloDTO();
 		Long cantidadPasajeros = vueloReqForm.getCantidadPasajeros();
 		Boolean encontrado = Boolean.FALSE;
