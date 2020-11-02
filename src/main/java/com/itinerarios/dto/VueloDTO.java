@@ -20,6 +20,7 @@ public class VueloDTO {
 	private String fechaLlegada;
 	private String horaLlegada;
 	private Long duracion;
+	private Long asientosVendidos;
 	private AeropuertoDTO aeropuerto;
 	private AeropuertoDTO aeropuertoDestino;
 	private Long asientosDisponibles;
@@ -80,6 +81,14 @@ public class VueloDTO {
 	 */
 	public void setDuracion(Long duracion) {
 		this.duracion = duracion;
+	}
+
+	public Long getAsientosVendidos() {
+		return asientosVendidos;
+	}
+
+	public void setAsientosVendidos(Long asientosVendidos) {
+		this.asientosVendidos = asientosVendidos;
 	}
 
 	public AeropuertoDTO getAeropuerto() {

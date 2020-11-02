@@ -21,6 +21,7 @@ public class Vuelo {
 	
 	private String horaPartida;
 	private Long duracion;
+	private Long asientosVendidos;
 	
 	@OneToOne
     @JoinColumn(name = "aeropuerto", referencedColumnName = "id", nullable = false)
@@ -70,6 +71,14 @@ public class Vuelo {
 
 	public void setDuracion(Long duracion) {
 		this.duracion = duracion;
+	}
+
+	public Long getAsientosVendidos() {
+		return asientosVendidos;
+	}
+
+	public void setAsientosVendidos(Long asientosVendidos) {
+		this.asientosVendidos = asientosVendidos;
 	}
 
 	public Aeropuerto getAeropuerto() {

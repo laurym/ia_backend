@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +22,11 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +54,7 @@ import com.itinerarios.request.form.UsuarioReqInfoForm;
 import com.itinerarios.request.form.VueloReqConfirmarForm;
 import com.itinerarios.request.form.VueloReqCrearForm;
 import com.itinerarios.request.form.VueloReqForm;
+import com.itinerarios.request.form.VueloReqModifForm;
 import com.itinerarios.response.form.GeneralResponseForm;
 import com.itinerarios.response.form.VueloResponseForm;
 import com.itinerarios.service.VueloServiceImpl;
@@ -247,7 +254,7 @@ public class VueloController {
 					setVuelosDTO.add(claseVueloDTO);
 				}
 			}
-
+			
 			vueloDTO.setClases(setVuelosDTO);
 			Iterator<ClaseVueloDTO> iterator = vueloDTO.getClases().iterator();
 			Long asientosDisponiblesTotal = 0L;
@@ -257,6 +264,7 @@ public class VueloController {
 			}
 
 			vueloDTO.setAsientosDisponibles(asientosDisponiblesTotal);
+			vueloDTO.setAsientosVendidos(0L);
 			vueloDTO.setAerolinea(aerolineaDTO);
 			
 			codigoRecurrente = vueloDTO.getCodigo();
@@ -318,11 +326,13 @@ public class VueloController {
 				&& (valorProbable.compareTo(idxDTO.getAsientosClaseDisponibles()) >=0  )) {
 				encontrado = Boolean.TRUE;
 				idxDTO.setAsientosVendidos(valorProbable);
+				
 				break;
 			}
 		}
 		
 		if (encontrado) {
+			vueloDTO.setAsientosVendidos(vueloDTO.getAsientosVendidos() + valorProbable);
 			vueloService.saveVuelo(DTOUtils.convertToEntity(vueloDTO));
 		}	else {
 			mensajeError = "No se pudo completar la operación.";
@@ -458,7 +468,7 @@ public class VueloController {
 				mensajeError = "OK";
 			vueloResponseForm.setListVuelos(listDTO);
 
-			vueloResponseForm.setMensaje(new GeneralResponseForm(mensajeError));
+//			vueloResponseForm.setMensaje(new GeneralResponseForm(mensajeError));
 			return listDTO;
 		} catch (RuntimeException e) {
 			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error";
@@ -470,6 +480,398 @@ public class VueloController {
 			throw new ExceptionServiceGeneral(mensajeError);
 		}
 	}
+	
+	@GetMapping("/busquedaAlt")
+	@ApiOperation(value = "Método para realizar la búsqueda de vuelos.",
+	 					 
+				notes= "\n\n Ante un error en la respuesta en los datos de entrada se retorna el error 409."
+						+ "\n\n Los parámetros a enviar son los siguientes :"
+						 + " \n\n  codigoAeropuertoOrigen (obligatorio), codigoAreopuertoDestino (obligatorio), "
+						 + " \n\n  fechaInicio tiene que tener el formato dd/MM/YYYY, "
+						 + " \n\n  cantidadPasajerosAdultos, cantidadPasajerosMenores, codigoClase"
+						 + " \n\n  pagina el default es 0, el paginado empieza en 0"
+						 + " \n\n  cantidadPorPagina el default es 20"
+						 + " \n\n  el Response contiene el numero de página, la cantidad de elementos totales, la cantidad de elementos por página, la lista de vuelos "
+						+ "  \n\n   **************************************************************  "
+						 + " \n\n  Ejemplo : URLBASE/itinerarios/vuelos/busquedaAlt?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
+	public VueloResponseForm obtenerVuelosV2(@RequestParam(name="codigoAeropuertoOrigen", required = true) String codigoAeropuertoOrigen,
+										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
+										@RequestParam(defaultValue = "0") int pagina,
+							            @RequestParam(defaultValue = "20") int cantidadPorPagina,
+										@RequestParam Map<String,String> vueloReqMap){//@RequestParam VueloReqForm vueloReqForm) {
+		LOG.info("***** Inicio  obtenerAeropuertos *****");
+		VueloResponseForm vueloResponseForm = new VueloResponseForm();
+		
+		
+		String mensajeError = "";
+		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA);
+
+		@SuppressWarnings("unused")
+		Date travelDate = null;
+		VueloReqForm vueloReqForm = null;
+		List<VueloDTO> listDTO = new ArrayList<VueloDTO>();
+		try {
+				  vueloReqForm = new VueloReqForm();
+				  vueloReqForm.setCodigoAeropuertoOrigen(codigoAeropuertoOrigen);
+				  vueloReqForm.setCodigoAeropuertoDestino(codigoAeropuertoDestino);
+				  
+				  vueloReqForm.setFechaInicio(vueloReqMap.get(ConstantsUtil.MAP_KEY_FECHA_INICIO));
+				  TipoClaseDTO tipoClaseDTO = new TipoClaseDTO();
+				  tipoClaseDTO.setCodigoClase(vueloReqMap.get(ConstantsUtil.MAP_KEY_CODIGO_CLASE));
+				  vueloReqForm.setTipoClase(tipoClaseDTO);
+				  try {
+				  vueloReqForm.setCantidadPasajerosAdultos(vueloReqMap.get(ConstantsUtil.MAP_KEY_CANT_PASAJEROS_ADULTOS) == null? 0 : Long.valueOf(vueloReqMap.get(ConstantsUtil.MAP_KEY_CANT_PASAJEROS_ADULTOS)));
+				  } catch (NumberFormatException e) {
+					  mensajeError = "02 - ***** PARSE ERROR ***** Cantidad de pasajeros adultos con error";
+						throw new ExceptionServiceGeneral(mensajeError);
+				  }
+				  
+				  try {
+				  vueloReqForm.setCantidadPasajerosMenores(vueloReqMap.get(ConstantsUtil.MAP_KEY_CANT_PASAJEROS_MENORES) == null? 0 : Long.valueOf(vueloReqMap.get(ConstantsUtil.MAP_KEY_CANT_PASAJEROS_MENORES)));
+				  }  catch (NumberFormatException e) {
+					  mensajeError = "02 - ***** PARSE ERROR ***** Cantidad de pasajeros adultos con error";
+						throw new ExceptionServiceGeneral(mensajeError);
+				  }
+			  
+			  
+			if (vueloReqForm.getFechaInicio() != null) {
+				try {
+					travelDate = formatter.parse(vueloReqForm.getFechaInicio());
+				} catch (DateTimeParseException e) {
+					// Thrown if text could not be parsed in the specified format
+					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
+					throw new ExceptionServiceGeneral(mensajeError);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
+					throw new ExceptionServiceGeneral(mensajeError);
+				}
+			}
+			
+			if (vueloReqForm.getCantidadPasajerosAdultos() < 0 || vueloReqForm.getCantidadPasajerosMenores() < 0) {
+				mensajeError = "13 -  ****** BUSQUEDA ERROR ****** cantidad pasajeros con error";
+				throw new ExceptionServiceGeneral(mensajeError);
+			}
+
+			if (vueloReqForm.getCantidadPasajerosAdultos() == 0 && vueloReqForm.getCantidadPasajerosMenores() == 0) {
+				vueloReqForm.setCantidadPasajerosAdultos(ConstantsUtil.CANTIDAD_PASAJEROS_DEFAULT);
+			}
+
+			if (vueloReqForm.getTipoClase() == null
+					|| vueloReqForm.getTipoClase().getCodigoClase() == null
+					|| vueloReqForm.getTipoClase().getCodigoClase().isEmpty()) {
+				TipoClaseDTO tipoClase = new TipoClaseDTO();
+				tipoClase.setCodigoClase(ConstantsUtil.CODIGO_CLASE_DEFAULT);
+				vueloReqForm.setTipoClase(tipoClase);
+			}
+
+			Long cantidadPasajeros = vueloReqForm.getCantidadPasajerosAdultos() + vueloReqForm.getCantidadPasajerosMenores();
+
+			String codigoClase = vueloReqForm.getTipoClase() == null ? null : vueloReqForm.getTipoClase().getCodigoClase();
+
+			Page<Vuelo> vuelosPage = vueloService.buscarVuelosPageable(pagina, cantidadPorPagina,
+												 vueloReqForm.getCodigoAeropuertoOrigen().toUpperCase(), vueloReqForm.getCodigoAeropuertoDestino(),
+												 cantidadPasajeros, vueloReqForm.getFechaInicio(), codigoClase);
+			Iterator<Vuelo> itObjs = vuelosPage.iterator();
+
+			Double valorTotal = 0D;
+			while (itObjs.hasNext()) {
+				Vuelo vuelo = itObjs.next();
+				VueloDTO dto = DTOUtils.convertToDto(vuelo);
+				Iterator<ClaseVueloDTO> clasesSet = dto.getClases().iterator();
+				Double precio = 0D;
+				while (clasesSet.hasNext()) {
+					ClaseVueloDTO claseIdx = clasesSet.next();
+					precio = claseIdx.getPrecio();
+				}
+				valorTotal = precio
+								* (vueloReqForm.getCantidadPasajerosAdultos() + vueloReqForm.getCantidadPasajerosMenores()
+								* (Double.valueOf(dto.getAerolinea().getPorcentajeDescuentoMenores()) / 100D));
+				dto.setValorTotal(valorTotal);
+				SimpleDateFormat formatter2 = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA_CON_HORA);
+				Date fechaInicio = formatter2.parse(dto.getFechaPartida() + " " + dto.getHoraPartida());
+				Date fechaLlegada = new Date (fechaInicio.getTime() + vuelo.getDuracion() * ConstantsUtil.MULTIPLIER_MINUTE);
+				
+				String date = formatter2.format(fechaLlegada);
+				String [] arrayDate = date.split(" ");
+				
+				dto.setFechaLlegada(arrayDate[0]);
+				dto.setHoraLlegada(arrayDate[1]);
+				
+				listDTO.add(dto);
+			}
+
+			
+			LOG.info("***** Fin  obtenerAeropuertos *****");
+			if (mensajeError == null || mensajeError.isEmpty())
+				mensajeError = "OK";
+			vueloResponseForm.setListVuelos(listDTO);
+
+        	
+//        	vueloResponseForm.setMensaje(new GeneralResponseForm(mensajeError));
+        	vueloResponseForm.setCantidadTotalPaginas(vuelosPage.getTotalPages());
+        	vueloResponseForm.setElementosTotal(vuelosPage.getTotalElements());
+        	vueloResponseForm.setNumeroDeElementosPagina(vuelosPage.getContent().size());
+        	vueloResponseForm.setNumeroPagina(Long.valueOf(vuelosPage.getPageable().getPageNumber()) +1L);
+        	
+        	return vueloResponseForm;
+		} catch (RuntimeException e) {
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error";
+			throw new ExceptionServiceGeneral(mensajeError);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error";
+			throw new ExceptionServiceGeneral(mensajeError);
+		}
+	}
+	
+	@GetMapping("/busquedaMod")
+	@ApiOperation(value = "Método para realizar la búsqueda de vuelos para realizar modificaciones.",
+	 					 
+				notes= "\n\n Ante un error en la respuesta en los datos de entrada se retorna el error 409."
+						+ "\n\n Los parámetros a enviar son los siguientes :"
+						 + " \n\n  codigoAeropuertoOrigen , codigoAreopuertoDestino , "
+						 + " \n\n  fechaInicio tiene que tener el formato dd/MM/YYYY, "
+						 + " \n\n  "
+						 + " \n\n  Devuelve los vuelos que no tienen ventas realizadas y que estan disponibles"
+						 + " \n\n  "
+						 + " \n\n  pagina el default es 0, el paginado empieza en 0"
+						 + " \n\n  cantidadPorPagina el default es 20"
+						 + " \n\n  el Response contiene el numero de página, la cantidad de elementos totales, la cantidad de elementos por página, la lista de vuelos "
+						+ "  \n\n   **************************************************************  "
+						 + " \n\n  Ejemplo : URLBASE/itinerarios/vuelos/busquedaMod?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&fechaInicio=24/10/2020&pagina=1")
+	public VueloResponseForm obtenerVuelosV2(
+										@RequestParam(defaultValue = "0") int pagina,
+							            @RequestParam(defaultValue = "20") int cantidadPorPagina,
+										@RequestParam Map<String,String> vueloReqMap,
+										@RequestHeader("token") String token) throws JsonMappingException, JsonProcessingException, IOException{//@RequestParam VueloReqForm vueloReqForm) {
+		LOG.info("***** Inicio  busquedaMod *****");
+		VueloReqForm vueloReqForm = new VueloReqForm();
+		
+		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
+		vueloReqForm.setAerolineaCodigo(usuario.getPropiedades().get("aerolinea"));
+
+		VueloResponseForm vueloResponseForm = new VueloResponseForm();
+		GeneralResponseForm formResponse = new GeneralResponseForm();
+		
+		String mensajeError = "";
+		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA);
+
+		Date travelDate = null;
+		List<VueloDTO> listDTO = new ArrayList<VueloDTO>();
+		try {
+				  vueloReqForm.setFechaInicio(vueloReqMap.get(ConstantsUtil.MAP_KEY_FECHA_INICIO));
+				  vueloReqForm.setCodigoAeropuertoOrigen(vueloReqMap.get(ConstantsUtil.MAP_KEY_CODIGO_AEROPUERTO_ORIGEN));
+				  vueloReqForm.setCodigoAeropuertoDestino(vueloReqMap.get(ConstantsUtil.MAP_KEY_CODIGO_AEROPUERTO_DESTINO));
+				  
+			if (vueloReqForm.getFechaInicio() != null && !vueloReqForm.getFechaInicio().isEmpty()) {
+				try {
+					travelDate = formatter.parse(vueloReqForm.getFechaInicio());
+					ZoneId defaultZoneId = ZoneId.systemDefault();
+					Date fechaAComparar = Date.from((LocalDate.now().atStartOfDay(defaultZoneId)).toInstant());//.toInstant(offset)(defaultZoneId)//Instant.now());
+					if (fechaAComparar.compareTo(travelDate) >0) {
+						formResponse = new GeneralResponseForm("10 - ***** PARSE ERROR ***** La fecha tiene que ser mayor a la actual");
+						throw new ExceptionServiceGeneral(formResponse.getMensaje());
+					}
+					
+				} catch (DateTimeParseException e) {
+					// Thrown if text could not be parsed in the specified format
+					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
+					throw new ExceptionServiceGeneral(mensajeError);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
+					throw new ExceptionServiceGeneral(mensajeError);
+				}
+			}
+			
+			Page<Vuelo> vuelosPage = vueloService.buscarVuelosPageable(pagina, cantidadPorPagina, vueloReqForm.getAerolineaCodigo(), 
+												 vueloReqForm.getCodigoAeropuertoOrigen(), vueloReqForm.getCodigoAeropuertoDestino(),
+												 vueloReqForm.getFechaInicio());
+			Iterator<Vuelo> itObjs = vuelosPage.iterator();
+
+			while (itObjs.hasNext()) {
+				Vuelo vuelo = itObjs.next();
+				VueloDTO dto = DTOUtils.convertToDto(vuelo);
+
+				SimpleDateFormat formatter2 = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA_CON_HORA);
+				Date fechaInicio = formatter2.parse(dto.getFechaPartida() + " " + dto.getHoraPartida());
+				Date fechaLlegada = new Date (fechaInicio.getTime() + vuelo.getDuracion() * ConstantsUtil.MULTIPLIER_MINUTE);
+				
+				String date = formatter2.format(fechaLlegada);
+				String [] arrayDate = date.split(" ");
+				
+				dto.setFechaLlegada(arrayDate[0]);
+				dto.setHoraLlegada(arrayDate[1]);
+				
+				listDTO.add(dto);
+			}
+			
+			LOG.info("***** Fin  busquedaMod *****");
+			if (mensajeError == null || mensajeError.isEmpty())
+				mensajeError = "OK";
+			vueloResponseForm.setListVuelos(listDTO);
+        	vueloResponseForm.setCantidadTotalPaginas(vuelosPage.getTotalPages());
+        	vueloResponseForm.setElementosTotal(vuelosPage.getTotalElements());
+        	vueloResponseForm.setNumeroDeElementosPagina(vuelosPage.getContent().size());
+        	vueloResponseForm.setNumeroPagina(Long.valueOf(vuelosPage.getPageable().getPageNumber()) +1L);
+        	
+        	return vueloResponseForm;
+		} catch (RuntimeException e) {
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error";
+			throw new ExceptionServiceGeneral(mensajeError);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error";
+			throw new ExceptionServiceGeneral(mensajeError);
+		}
+	}
+
+	@PostMapping(value = "/modificarVuelo", consumes = "application/json", produces = "application/json")
+	@ApiOperation(value = "Método para crear los vuelos según los parametros ingresados y el usuario de token informado", 
+				  notes = "En el caso de error se muestra el mensaje correspondiente de error al ingreso de datos."
+						  + "\n\n	Se retorna el mensaje de OK ante un alta saitsfactorio.")
+		
+	public GeneralResponseForm modificarVuelo(@RequestParam(name="codigoVuelo", required = true) String codigoVuelo,
+											  @RequestBody VueloReqModifForm vueloReqForm,
+											 @RequestHeader("token") String token
+											 ) throws JsonMappingException, JsonProcessingException, IOException {
+		
+		LOG.info("***** Inicio  modificarVuelo *****");
+		
+		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
+		vueloReqForm.setAerolineaCodigo(usuario.getPropiedades().get("aerolinea"));
+
+		String mensajeError = "";
+		GeneralResponseForm formResponse = null;
+		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA);
+
+		Date fechaInicio;
+
+		if (vueloReqForm.getFechaInicio() != null && !vueloReqForm.getFechaInicio().isEmpty()) {
+			try {
+				String horaInicio =(vueloReqForm.getHoraInicio()!=null)? " "+vueloReqForm.getHoraInicio(): "";
+				fechaInicio = formatter.parse(vueloReqForm.getFechaInicio() + horaInicio);
+				Date fechaAComparar = new Date(Instant.now().toEpochMilli());
+
+				if (fechaAComparar.compareTo(fechaInicio) > 0) {
+					formResponse = new GeneralResponseForm(
+							"10 - ***** PARSE ERROR ***** La fecha tiene que ser mayor a la actual");
+					throw new ExceptionServiceGeneral(formResponse.getMensaje());
+				}
+
+			} catch (DateTimeParseException e) {
+				// Thrown if text could not be parsed in the specified format
+				formResponse = new GeneralResponseForm("06 - ***** PARSE ERROR ***** Fecha u hora de inicio con error");
+				throw new ExceptionServiceGeneral(formResponse.getMensaje());
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				formResponse = new GeneralResponseForm("06 - ***** PARSE ERROR ***** Fecha u hora de inicio con error");
+				throw new ExceptionServiceGeneral(formResponse.getMensaje());
+			}
+		}
+
+		if (vueloReqForm.getCodigoVuelo() == null) {
+			mensajeError = "04 -  ****** PARSE ERROR ****** aeropuertos con error - " + vueloReqForm.getCodigoVuelo()
+					+ " - " + vueloReqForm.getCodigoVuelo();
+			throw new ExceptionServiceGeneral(mensajeError);
+		}
+
+		Vuelo vuelo = this.vueloService.buscarVueloPorCodigo(vueloReqForm.getCodigoVuelo());
+		
+		if(vuelo != null) {
+			if (vueloReqForm.getFechaInicio()!=null)
+				 vuelo.setFechaPartida(vueloReqForm.getFechaInicio());
+			if(vueloReqForm.getHoraInicio()!=null)
+				vueloReqForm.setHoraInicio(vueloReqForm.getHoraInicio());
+			if(vueloReqForm.getIsDisponible()!=null) {
+				Boolean disponible = vueloReqForm.getIsDisponible().compareTo(Boolean.TRUE) ==0 ? Boolean.TRUE : (vueloReqForm.getIsDisponible().compareTo(Boolean.FALSE) ==0 ? Boolean.FALSE :null); 
+				if(disponible!= null)
+					vueloReqForm.setIsDisponible(vueloReqForm.getIsDisponible());
+			}
+			try {
+				if (vueloReqForm.getDuracion() != null) {
+					if (Long.valueOf(vueloReqForm.getDuracion()) < 0L) {
+						formResponse = new GeneralResponseForm("07 - ***** PARSE ERROR ***** Duracion con error");
+						throw new ExceptionServiceGeneral(formResponse.getMensaje());
+					}
+				}
+			} catch (NumberFormatException e) {
+				formResponse = new GeneralResponseForm("07 - ***** PARSE ERROR ***** Duracion con error");
+				throw new ExceptionServiceGeneral(formResponse.getMensaje());
+			}
+			
+			if (vueloReqForm.getDuracion() != null)
+				vuelo.setDuracion(Long.valueOf(vueloReqForm.getDuracion()));
+			
+			vueloService.saveVuelo(vuelo);
+			if (mensajeError == null || mensajeError.isEmpty()) {
+				mensajeError = "OK";
+			} else {
+				mensajeError ="No se encontró el código de vuelo ingresado.";
+			}
+		}
+		LOG.info("***** Fin  modificarVuelo *****");
+		formResponse = new GeneralResponseForm(mensajeError);
+		return formResponse;
+	}
+	
+	@GetMapping("/busquedaPorCodigo")
+	@ApiOperation(value = "Método para realizar la búsqueda de vuelos por codigo.",
+	 					 
+				notes= "\n\n Ante un error en la respuesta en los datos de entrada se retorna el error 409."
+						+ "\n\n Los parámetros a enviar son los siguientes :"
+						 + " \n\n  codigoAeropuertoOrigen (obligatorio), codigoAreopuertoDestino (obligatorio), "
+						 + " \n\n  fechaInicio tiene que tener el formato dd/MM/YYYY, "
+						 + " \n\n  cantidadPasajerosAdultos, cantidadPasajerosMenores, codigoClase"
+						+ "  \n\n   **************************************************************  "
+						 + " \n\n  Ejemplo : URLBASE/itinerarios/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
+	
+	public VueloDTO buscarVuelosPorCodigoVuelo(String codigoVuelo){
+		Vuelo vuelos = this.vueloService.buscarVueloPorCodigo(codigoVuelo);
+		
+//		List<VueloDTO> vuelosDTO = new ArrayList<>();
+//		for(Vuelo idx : vuelos) {
+			VueloDTO vueloDTO = new VueloDTO();
+			vueloDTO = DTOUtils.convertToDto(vuelos);
+//			vuelosDTO.add(vueloDTO);
+//		}
+//		
+		return vueloDTO;
+	}
+	
+	
+//	@GetMapping("/paises")
+    public List<VueloDTO> paginas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "30") int size,
+            @RequestParam(defaultValue = "fechaPartida") String order,
+            @RequestParam(defaultValue = "true") boolean asc
+    ){
+        Page<Vuelo> vuelos = vueloService.paginas(PageRequest.of(page, size, Sort.by(order)));
+        if(!asc)
+            vuelos = vueloService.paginas(PageRequest.of(page, size, Sort.by(order).descending()));
+        
+        	Iterator<Vuelo> itVuelos = vuelos.iterator();
+        	List<VueloDTO> vuelosDTOList = new ArrayList<>();
+        	
+        	while (itVuelos.hasNext()) {
+        		Vuelo vuelo = itVuelos.next();
+        		VueloDTO vueloDTO = DTOUtils.convertToDto(vuelo);
+        		vuelosDTOList.add(vueloDTO);
+        	}
+//        	        return new PageImpl<Patient>(patientsList.subList(start, end), new PageRequest(page, size), patientsList.size());
+        	Pageable paging = PageRequest.of(page, size);
+        	Page<VueloDTO> vuelosReturn = new PageImpl<VueloDTO>(vuelosDTOList , paging , vuelos.getTotalElements());
+        	return vuelosReturn.toList();//, HttpStatus.OK);
+    }
 	
 	private Long getRandomNumberLongs(Long min, Long max) {
 		Random random = new Random();

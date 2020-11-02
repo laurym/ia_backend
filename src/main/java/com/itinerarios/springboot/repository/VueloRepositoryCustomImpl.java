@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.ClaseVuelo;
 import com.itinerarios.entity.Vuelo;
 
@@ -107,5 +108,55 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 	    			
 			return vuelosReturn;
 		}
+	    
+	    public List<Vuelo> buscarPorAerolineaAeropuertoAeropuertoDestinoFecha(Long aeropuerto, Long aeropuertoDestino, Long aerolineaId, String date){
+	    	
+	    	String consultaPorVuelos = "from Vuelo as vuelo JOIN ClaseVuelo  as claseVuelo"
+	    			+ " on vuelo.codigo =  claseVuelo.codigoVuelo.codigo"
+					+  " WHERE "
+					+  " vuelo.aerolinea.id = :aerolineaId"
+					
+					+  ((aeropuerto!=null)? " and vuelo.aeropuerto.id = :aeropuerto " :"")
+					+  ((aeropuertoDestino!=null)? " and vuelo.aeropuertoDestino.id = :aeropuertoDestino" : "")
+					+	" and vuelo.fechaPartida >=  :fecha "
+    				+  " and vuelo.disponible = :disponible "
+//    				+  " and vuelo.asientosVendidos = 0 "
+					+ " ORDER by vuelo.fechaPartida asc, vuelo.horaPartida asc";
+
+			Query query = entityManager.createQuery(consultaPorVuelos);
+			if (aeropuerto!=null)
+			query.setParameter("aeropuerto", aeropuerto);
+			if (aeropuertoDestino!=null)
+			query.setParameter("aeropuertoDestino", aeropuertoDestino);	
+			query.setParameter("aerolineaId", aerolineaId);
+			query.setParameter("disponible", true);
+			if(date== null || date.isEmpty()) {
+				LocalDate today = LocalDate.now();
+				String formattedDate = today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+				query.setParameter("fecha", "\'"+formattedDate+"\'");
+			} else {
+				query.setParameter("fecha", date);
+			}
+			
+			List<Object[]> vuelosBase  = query.getResultList();
+	    	List<Vuelo> vuelosReturn = new ArrayList<Vuelo>();
+			for (Object[] value : vuelosBase) {
+				Vuelo vuelo = null;
+				for (Object object : value) {
+					if (object.getClass().equals(Vuelo.class)) {
+						vuelo = (Vuelo) object;
+					}
+					if(object.getClass().equals(ClaseVuelo.class)) {
+						Set<ClaseVuelo> clases = new HashSet<ClaseVuelo>();
+						clases.add((ClaseVuelo) object);
+						vuelo.setClases(clases);
+						vuelosReturn.add(vuelo);
+					}
+				}
+			}
+			
+
+	    	return vuelosReturn;
+	    }
 		
 }

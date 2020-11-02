@@ -6,18 +6,12 @@ import com.itinerarios.dto.VueloDTO;
 
 public class VueloResponseForm {
 
-	private Double precioTotalPasajeros;
-
 	private List<VueloDTO> listVuelos;
-	private GeneralResponseForm mensaje;
-
-	public Double getPrecioTotalPasajeros() {
-		return precioTotalPasajeros;
-	}
-
-	public void setPrecioTotalPasajeros(Double precioTotalPasajeros) {
-		this.precioTotalPasajeros = precioTotalPasajeros;
-	}
+//	private GeneralResponseForm mensaje;
+	private Integer cantidadTotalPaginas;
+	private Long elementosTotal;
+	private Integer numeroDeElementos;
+	private Long numeroPagina;
 
 	public List<VueloDTO> getListVuelos() {
 		return listVuelos;
@@ -27,12 +21,44 @@ public class VueloResponseForm {
 		this.listVuelos = listVuelos;
 	}
 
-	public GeneralResponseForm getMensaje() {
-		return mensaje;
+//	public GeneralResponseForm getMensaje() {
+//		return mensaje;
+//	}
+//
+//	public void setMensaje(GeneralResponseForm mensaje) {
+//		this.mensaje = mensaje;
+//	}
+
+	public Integer getCantidadTotalPaginas() {
+		return cantidadTotalPaginas;
 	}
 
-	public void setMensaje(GeneralResponseForm mensaje) {
-		this.mensaje = mensaje;
+	public void setCantidadTotalPaginas(Integer cantidadTotalPaginas) {
+		this.cantidadTotalPaginas = cantidadTotalPaginas;
+	}
+
+	public Long getElementosTotal() {
+		return elementosTotal;
+	}
+
+	public void setElementosTotal(Long elementosTotal) {
+		this.elementosTotal = elementosTotal;
+	}
+
+	public Integer getNumeroDeElementosPagina() {
+		return numeroDeElementos;
+	}
+
+	public void setNumeroDeElementosPagina(Integer numeroDeElementos) {
+		this.numeroDeElementos = numeroDeElementos;
+	}
+
+	public Long getNumeroPagina() {
+		return numeroPagina;
+	}
+
+	public void setNumeroPagina(Long numeroPagina) {
+		this.numeroPagina = numeroPagina;
 	}
 
 }

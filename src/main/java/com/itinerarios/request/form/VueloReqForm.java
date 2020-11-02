@@ -12,6 +12,8 @@ public class VueloReqForm extends GeneralReqForm{
 	private Long cantidadPasajerosMenores;
 	
 	private TipoClaseDTO tipoClase;
+	
+	private String aerolineaCodigo;
 
 	public String getFechaInicio() {
 		return fechaInicio;
@@ -67,5 +69,13 @@ public class VueloReqForm extends GeneralReqForm{
 
 	public void setTipoClase(TipoClaseDTO tipoClase) {
 		this.tipoClase = tipoClase;
+	}
+
+	public String getAerolineaCodigo() {
+		return aerolineaCodigo;
+	}
+
+	public void setAerolineaCodigo(String aerolineaCodigo) {
+		this.aerolineaCodigo = aerolineaCodigo;
 	} 
 }
