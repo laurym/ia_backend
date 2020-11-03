@@ -397,6 +397,13 @@ public class VueloController {
 			if (vueloReqForm.getFechaInicio() != null) {
 				try {
 					travelDate = formatter.parse(vueloReqForm.getFechaInicio());
+					ZoneId defaultZoneId = ZoneId.systemDefault();
+					Date fechaAComparar = Date.from((LocalDate.now().atStartOfDay(defaultZoneId)).toInstant());
+					if (fechaAComparar.compareTo(travelDate) >0) {
+						mensajeError = "10 - ***** PARSE ERROR ***** La fecha tiene que ser mayor a la actual";
+						throw new ExceptionServiceGeneral(mensajeError);
+					}
+					
 				} catch (DateTimeParseException e) {
 					// Thrown if text could not be parsed in the specified format
 					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
@@ -471,17 +478,17 @@ public class VueloController {
 //			vueloResponseForm.setMensaje(new GeneralResponseForm(mensajeError));
 			return listDTO;
 		} catch (RuntimeException e) {
-			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error";
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error. " + e.getMessage();
 			throw new ExceptionServiceGeneral(mensajeError);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error";
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error  " + e.getMessage();
 			throw new ExceptionServiceGeneral(mensajeError);
 		}
 	}
 	
-	@GetMapping("/busquedaAlt")
+	@GetMapping("/busquedaPag")
 	@ApiOperation(value = "Método para realizar la búsqueda de vuelos.",
 	 					 
 				notes= "\n\n Ante un error en la respuesta en los datos de entrada se retorna el error 409."
@@ -489,11 +496,22 @@ public class VueloController {
 						 + " \n\n  codigoAeropuertoOrigen (obligatorio), codigoAreopuertoDestino (obligatorio), "
 						 + " \n\n  fechaInicio tiene que tener el formato dd/MM/YYYY, "
 						 + " \n\n  cantidadPasajerosAdultos, cantidadPasajerosMenores, codigoClase"
-						 + " \n\n  pagina el default es 0, el paginado empieza en 0"
+						 + " \n\n  pagina el default es 0, el paginado empieza en 0. Tener en cuenta que en el response el campo numeroPagina se devuelve como si empezara en 1."
+						 + " \n\n  Como así también el campo cantidadTotalPaginas es el total empezando desde 1."
 						 + " \n\n  cantidadPorPagina el default es 20"
 						 + " \n\n  el Response contiene el numero de página, la cantidad de elementos totales, la cantidad de elementos por página, la lista de vuelos "
+						 + "\n\n EJEMPLO DE RESPONSE \r\n"
+						 + " {\r\n"
+						 + "    \"listVuelos\": [{...}],\r\n"
+						 + "    \"cantidadTotalPaginas\": 1,\r\n"
+						 + "    \"elementosTotal\": 7,\r\n"
+						 + "    \"numeroPagina\": 1,\r\n"
+						 + "    \"numeroDeElementosPagina\": 7\r\n"
+						 + "}"
 						+ "  \n\n   **************************************************************  "
-						 + " \n\n  Ejemplo : URLBASE/itinerarios/vuelos/busquedaAlt?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
+						 + " \n\n  EJEMPLO REQUEST #1 : URLBASE/itinerarios/vuelos/busquedaPag?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1"
+						 + " \n\n se pueden agregar los campos pagina y cantidadPorPagina, recordar que si no estan incluidos se armaran valores por default"
+						 + " \n\n  EJEMPLO REQUEST #2 : URLBASE/itinerarios/vuelos/busquedaPag?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1&pagina=1&cantidadPorPagina=10")
 	public VueloResponseForm obtenerVuelosV2(@RequestParam(name="codigoAeropuertoOrigen", required = true) String codigoAeropuertoOrigen,
 										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
 										@RequestParam(defaultValue = "0") int pagina,
@@ -537,6 +555,12 @@ public class VueloController {
 			if (vueloReqForm.getFechaInicio() != null) {
 				try {
 					travelDate = formatter.parse(vueloReqForm.getFechaInicio());
+					ZoneId defaultZoneId = ZoneId.systemDefault();
+					Date fechaAComparar = Date.from((LocalDate.now().atStartOfDay(defaultZoneId)).toInstant());
+					if (fechaAComparar.compareTo(travelDate) >0) {
+						mensajeError = "10 - ***** PARSE ERROR ***** La fecha tiene que ser mayor a la actual";
+						throw new ExceptionServiceGeneral(mensajeError);
+					}
 				} catch (DateTimeParseException e) {
 					// Thrown if text could not be parsed in the specified format
 					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
@@ -636,14 +660,25 @@ public class VueloController {
 						 + " \n\n  codigoAeropuertoOrigen , codigoAreopuertoDestino , "
 						 + " \n\n  fechaInicio tiene que tener el formato dd/MM/YYYY, "
 						 + " \n\n  "
-						 + " \n\n  Devuelve los vuelos que no tienen ventas realizadas y que estan disponibles"
+						 + " \n\n  Devuelve los vuelos que estan disponibles, indistantemente si tienen asientos vendidos o no"
 						 + " \n\n  "
-						 + " \n\n  pagina el default es 0, el paginado empieza en 0"
 						 + " \n\n  cantidadPorPagina el default es 20"
-						 + " \n\n  el Response contiene el numero de página, la cantidad de elementos totales, la cantidad de elementos por página, la lista de vuelos "
-						+ "  \n\n   **************************************************************  "
-						 + " \n\n  Ejemplo : URLBASE/itinerarios/vuelos/busquedaMod?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&fechaInicio=24/10/2020&pagina=1")
-	public VueloResponseForm obtenerVuelosV2(
+						 + " \n\n  pagina el default es 0, el paginado empieza en 0. Tener en cuenta que en el response el campo numeroPagina se devuelve como si empezara en 1.\r\n"
+						 + " \n\n  Como así también el campo cantidadTotalPaginas es el total empezando desde 1.\r\n"
+						 + " \n\n  cantidadPorPagina el default es 20\r\n"
+						 + " \n\n  el Response contiene el numero de página, la cantidad de elementos totales, la cantidad de elementos por página, la lista de vuelos \r\n"
+						 + " \n\n EJEMPLO DE RESPONSE \r\n"
+						 + " {\r\n"
+						 + "	\"listVuelos\": [{...}],\r\n"
+						 + "    \"cantidadTotalPaginas\": 1,\r\n"
+						 + "    \"elementosTotal\": 7,\r\n"
+						 + "	\"numeroPagina\": 1,\r\n"
+						 + "	\"numeroDeElementosPagina\": 7\r\n"
+						 + " }"
+						 + "  \n\n   **************************************************************  "
+						 + " \n\n  Ejemplo #1 : URLBASE/itinerarios/vuelos/busquedaMod?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&fechaInicio=24/10/2020&pagina=1"
+						 + " \n\n  Ejemplo #2 : URLBASE/itinerarios/vuelos/busquedaMod?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&pagina=1\"")
+	public VueloResponseForm obtenerVuelosModif(
 										@RequestParam(defaultValue = "0") int pagina,
 							            @RequestParam(defaultValue = "20") int cantidadPorPagina,
 										@RequestParam Map<String,String> vueloReqMap,
@@ -736,28 +771,39 @@ public class VueloController {
 	@PostMapping(value = "/modificarVuelo", consumes = "application/json", produces = "application/json")
 	@ApiOperation(value = "Método para crear los vuelos según los parametros ingresados y el usuario de token informado", 
 				  notes = "En el caso de error se muestra el mensaje correspondiente de error al ingreso de datos."
-						  + "\n\n	Se retorna el mensaje de OK ante un alta saitsfactorio.")
+				  		  + "\n\n	EJEMPLO REQUEST todos son opcionales excepto el codigo de Vuelo : "
+				  		  + "{\r\n"
+				  		  + "  \"fechaInicio\": \"24/12/2020\",\r\n"
+				  		  + "  \"horaInicio\": \"04:18:00\",\r\n"
+				  		  + "  \"duracion\": \"23333\"\r\n"
+				  		  + "  \"isDisponible\": true\r\n"
+				  		  + "  \"codigoVuelo\": \"LA 329452\",\r\n"
+				  		  + "}"
+						  + "\n\n	Se retorna el mensaje de OK ante una modificacion satisfactoria.")
 		
 	public GeneralResponseForm modificarVuelo(@RequestParam(name="codigoVuelo", required = true) String codigoVuelo,
-											  @RequestBody VueloReqModifForm vueloReqForm,
-											 @RequestHeader("token") String token
+											  @RequestBody VueloReqModifForm vueloReqForm/*,
+											  @RequestHeader("token") String token*/
 											 ) throws JsonMappingException, JsonProcessingException, IOException {
 		
 		LOG.info("***** Inicio  modificarVuelo *****");
 		
-		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
-		vueloReqForm.setAerolineaCodigo(usuario.getPropiedades().get("aerolinea"));
+//		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
+		vueloReqForm.setAerolineaCodigo("LA");//usuario.getPropiedades().get("aerolinea"));
 
 		String mensajeError = "";
 		GeneralResponseForm formResponse = null;
 		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA);
-
+		SimpleDateFormat formatter2 = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA_CON_HORA);
 		Date fechaInicio;
 
 		if (vueloReqForm.getFechaInicio() != null && !vueloReqForm.getFechaInicio().isEmpty()) {
 			try {
 				String horaInicio =(vueloReqForm.getHoraInicio()!=null)? " "+vueloReqForm.getHoraInicio(): "";
-				fechaInicio = formatter.parse(vueloReqForm.getFechaInicio() + horaInicio);
+				if(horaInicio.isEmpty())
+					fechaInicio = formatter.parse(vueloReqForm.getFechaInicio() + horaInicio);
+				else 
+					fechaInicio = formatter2.parse(vueloReqForm.getFechaInicio() + horaInicio);
 				Date fechaAComparar = new Date(Instant.now().toEpochMilli());
 
 				if (fechaAComparar.compareTo(fechaInicio) > 0) {
@@ -826,14 +872,7 @@ public class VueloController {
 	@GetMapping("/busquedaPorCodigo")
 	@ApiOperation(value = "Método para realizar la búsqueda de vuelos por codigo.",
 	 					 
-				notes= "\n\n Ante un error en la respuesta en los datos de entrada se retorna el error 409."
-						+ "\n\n Los parámetros a enviar son los siguientes :"
-						 + " \n\n  codigoAeropuertoOrigen (obligatorio), codigoAreopuertoDestino (obligatorio), "
-						 + " \n\n  fechaInicio tiene que tener el formato dd/MM/YYYY, "
-						 + " \n\n  cantidadPasajerosAdultos, cantidadPasajerosMenores, codigoClase"
-						+ "  \n\n   **************************************************************  "
-						 + " \n\n  Ejemplo : URLBASE/itinerarios/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
-	
+				notes= "\n\n A propositos de buscar el vuelo por el codigo.")
 	public VueloDTO buscarVuelosPorCodigoVuelo(String codigoVuelo){
 		Vuelo vuelos = this.vueloService.buscarVueloPorCodigo(codigoVuelo);
 		
