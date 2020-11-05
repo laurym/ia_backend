@@ -323,7 +323,7 @@ public class VueloController {
 			ClaseVueloDTO idxDTO = iterator.next();
 			valorProbable = idxDTO.getAsientosVendidos() + cantidadPasajeros;
 			if(codigoClase.compareTo(idxDTO.getClase().getCodigoClase()) ==0
-				&& (valorProbable.compareTo(idxDTO.getAsientosClaseDisponibles()) >=0  )) {
+				&& (valorProbable.compareTo(idxDTO.getAsientosClaseDisponibles()) <=0  )) {
 				encontrado = Boolean.TRUE;
 				idxDTO.setAsientosVendidos(valorProbable);
 				

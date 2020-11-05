@@ -211,8 +211,18 @@ public class VueloServiceImpl {
 
 	public void saveVuelo(Vuelo entity) {
 		
-		getVueloRepository().save(entity);
 		Iterator<ClaseVuelo> itClasesVuelos = entity.getClases().iterator();
+		Long contadorAsientos = 0L;
+		while(itClasesVuelos.hasNext()) {
+			ClaseVuelo idxObj = itClasesVuelos.next();
+			contadorAsientos += idxObj.getAsientosVendidos();
+		}
+		entity.setAsientosVendidos(contadorAsientos);
+		
+		getVueloRepository().save(entity);
+		
+		itClasesVuelos = entity.getClases().iterator();
+		
 		while (itClasesVuelos.hasNext()) {
 			ClaseVuelo idxObj = itClasesVuelos.next();
 			ClaseVuelo claseBase = getClaseVueloRepository().find(entity.getCodigo(), idxObj.getCodigoClase().getCodigoClase());
@@ -221,6 +231,7 @@ public class VueloServiceImpl {
 				getClaseVueloRepository().save(idxObj);
 			} else {
 				claseBase.setAsientosClaseDisponibles(idxObj.getAsientosClaseDisponibles());
+				claseBase.setAsientosVendidos(idxObj.getAsientosVendidos());
 				claseBase.setPrecio(idxObj.getPrecio());
 				getClaseVueloRepository().save(claseBase);
 			}
