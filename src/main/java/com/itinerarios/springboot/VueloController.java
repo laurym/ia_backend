@@ -870,20 +870,53 @@ public class VueloController {
 	}
 	
 	@GetMapping("/busquedaPorCodigo")
-	@ApiOperation(value = "Método para realizar la búsqueda de vuelos por codigo.",
+	@ApiOperation(value = "Método para realizar la búsqueda de vuelos por código."
+						+ "	\n\n No se muestra info sobre precios si sobre el vuelo en si."
+						+ " \n\n Se agrego en el request el token",
 	 					 
-				notes= "\n\n A propositos de buscar el vuelo por el codigo.")
-	public VueloDTO buscarVuelosPorCodigoVuelo(String codigoVuelo){
-		Vuelo vuelos = this.vueloService.buscarVueloPorCodigo(codigoVuelo);
-		
-//		List<VueloDTO> vuelosDTO = new ArrayList<>();
-//		for(Vuelo idx : vuelos) {
-			VueloDTO vueloDTO = new VueloDTO();
-			vueloDTO = DTOUtils.convertToDto(vuelos);
-//			vuelosDTO.add(vueloDTO);
-//		}
-//		
-		return vueloDTO;
+				notes= "\n\n A propósitos de buscar el vuelo por el código.")
+	public VueloDTO buscarVuelosPorCodigoVuelo(@RequestParam(name = "codigoVuelo", required = true) String codigoVuelo,
+			@RequestHeader("token") String token) {
+
+		LOG.info("***** Inicio  buscarVuelosPorCodigoVuelo *****");
+		GeneralResponseForm formResponse = null;
+		String mensajeError = "";
+		VueloDTO vueloDTO = new VueloDTO();
+
+		if (!JWTUtils.verificarToken(token)) {
+			formResponse = new GeneralResponseForm("***** TOKEN ERROR ***** error al verificar token");
+			throw new ExceptionServiceGeneral(formResponse.getMensaje());
+		}
+		try {
+
+			Vuelo vuelo = this.vueloService.buscarVueloPorCodigo(codigoVuelo);
+
+			if (vuelo != null) {
+				vueloDTO = DTOUtils.convertToDto(vuelo);
+
+				SimpleDateFormat formatter2 = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA_CON_HORA);
+				Date fechaInicio = formatter2.parse(vueloDTO.getFechaPartida() + " " + vueloDTO.getHoraPartida());
+				Date fechaLlegada = new Date(fechaInicio.getTime() + vueloDTO.getDuracion() * ConstantsUtil.MULTIPLIER_MINUTE);
+
+				String date = formatter2.format(fechaLlegada);
+				String[] arrayDate = date.split(" ");
+
+				vueloDTO.setFechaLlegada(arrayDate[0]);
+				vueloDTO.setHoraLlegada(arrayDate[1]);
+			}
+			
+			LOG.info("***** Fin  buscarVuelosPorCodigoVuelo *****");
+
+			return vueloDTO;
+		} catch (RuntimeException e) {
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error. " + e.getMessage();
+			throw new ExceptionServiceGeneral(mensajeError);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error  " + e.getMessage();
+			throw new ExceptionServiceGeneral(mensajeError);
+		}
 	}
 	
 	
