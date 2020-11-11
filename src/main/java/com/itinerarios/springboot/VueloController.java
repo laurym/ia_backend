@@ -200,8 +200,12 @@ public class VueloController {
 						|| (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.SEMANAL) == 0 && vueloReqForm.getRecurrencia().getCantidadRecurrencia() > 52)))) {
 			mensajeError = "12 -  ****** RECURRENCIA ERROR ****** recurrencia con error";
 			throw new ExceptionServiceGeneral(mensajeError);
-		}
-		else if (vueloReqForm.getRecurrencia()==null){
+		} else if (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.UNICO) == 0){
+			RecurrenciaVueloDTO recurrenciaDTO = vueloReqForm.getRecurrencia();
+			recurrenciaDTO.setCantidadRecurrencia(1L);
+			vueloReqForm.setRecurrencia(recurrenciaDTO);
+			
+		} else if (vueloReqForm.getRecurrencia()==null){
 			RecurrenciaVueloDTO recurrenciaDTO = new RecurrenciaVueloDTO();
 			recurrenciaDTO.setTipoRecurrencia(TipoRecurrencia.UNICO);
 			recurrenciaDTO.setCantidadRecurrencia(1L);
