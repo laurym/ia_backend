@@ -16,6 +16,7 @@ public class ConstantsUtil {
 	public static Long MULTIPLIER_MINUTE = 60000L;
 	
 	public static String MAP_KEY_FECHA_INICIO ="fechaInicio";
+	public static String MAP_KEY_FECHA_FIN ="fechaFin";
 	public static String MAP_KEY_CODIGO_AEROPUERTO_ORIGEN ="codigoAeropuertoOrigen";
 	public static String MAP_KEY_CODIGO_AEROPUERTO_DESTINO ="codigoAeropuertoDestino";
 	public static String MAP_KEY_CANT_PASAJEROS_ADULTOS="cantidadPasajerosAdultos";

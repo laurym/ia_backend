@@ -699,21 +699,55 @@ public class VueloController {
 		String mensajeError = "";
 		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA);
 
-		Date travelDate = null;
+		Date travelDateInicio = null;
+		Date travelDateFin = null;
 		List<VueloDTO> listDTO = new ArrayList<VueloDTO>();
 		try {
 				  vueloReqForm.setFechaInicio(vueloReqMap.get(ConstantsUtil.MAP_KEY_FECHA_INICIO));
+				  vueloReqForm.setFechaFin(vueloReqMap.get(ConstantsUtil.MAP_KEY_FECHA_FIN));
 				  vueloReqForm.setCodigoAeropuertoOrigen(vueloReqMap.get(ConstantsUtil.MAP_KEY_CODIGO_AEROPUERTO_ORIGEN));
 				  vueloReqForm.setCodigoAeropuertoDestino(vueloReqMap.get(ConstantsUtil.MAP_KEY_CODIGO_AEROPUERTO_DESTINO));
 				  
 			if (vueloReqForm.getFechaInicio() != null && !vueloReqForm.getFechaInicio().isEmpty()) {
 				try {
-					travelDate = formatter.parse(vueloReqForm.getFechaInicio());
+					travelDateInicio = formatter.parse(vueloReqForm.getFechaInicio());
 					ZoneId defaultZoneId = ZoneId.systemDefault();
 					Date fechaAComparar = Date.from((LocalDate.now().atStartOfDay(defaultZoneId)).toInstant());//.toInstant(offset)(defaultZoneId)//Instant.now());
-					if (fechaAComparar.compareTo(travelDate) >0) {
+					if (fechaAComparar.compareTo(travelDateInicio) >0) {
 						formResponse = new GeneralResponseForm("10 - ***** PARSE ERROR ***** La fecha tiene que ser mayor a la actual");
 						throw new ExceptionServiceGeneral(formResponse.getMensaje());
+					}
+					
+				} catch (DateTimeParseException e) {
+					// Thrown if text could not be parsed in the specified format
+					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
+					throw new ExceptionServiceGeneral(mensajeError);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
+					throw new ExceptionServiceGeneral(mensajeError);
+				}
+			}
+			
+			if (vueloReqForm.getFechaFin() != null && !vueloReqForm.getFechaFin().isEmpty()) {
+				try {
+					travelDateFin = formatter.parse(vueloReqForm.getFechaFin());
+					ZoneId defaultZoneId = ZoneId.systemDefault();
+					Date fechaAComparar = Date.from((LocalDate.now().atStartOfDay(defaultZoneId)).toInstant());//.toInstant(offset)(defaultZoneId)//Instant.now());
+					if (fechaAComparar.compareTo(travelDateFin) >0) {
+						formResponse = new GeneralResponseForm("10 - ***** PARSE ERROR ***** La fecha tiene que ser mayor a la actual");
+						throw new ExceptionServiceGeneral(formResponse.getMensaje());
+					}
+					
+					if (travelDateInicio.compareTo(travelDateFin) ==0) {
+						
+						
+						LocalDateTime today = travelDateFin.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+						LocalDateTime dateTime = today.plus(1, ChronoUnit.DAYS);
+						vueloReqForm.setFechaFin(formatter.format(new Date(dateTime.toString())));
+						
 					}
 					
 				} catch (DateTimeParseException e) {
@@ -785,15 +819,15 @@ public class VueloController {
 				  		  + "}"
 						  + "\n\n	Se retorna el mensaje de OK ante una modificacion satisfactoria.")
 		
-	public GeneralResponseForm modificarVuelo(@RequestParam(name="codigoVuelo", required = true) String codigoVuelo,
-											  @RequestBody VueloReqModifForm vueloReqForm/*,
-											  @RequestHeader("token") String token*/
+	public GeneralResponseForm modificarVuelo(
+											  @RequestBody VueloReqModifForm vueloReqForm,
+											  @RequestHeader("token") String token
 											 ) throws JsonMappingException, JsonProcessingException, IOException {
 		
 		LOG.info("***** Inicio  modificarVuelo *****");
 		
-//		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
-		vueloReqForm.setAerolineaCodigo("LA");//usuario.getPropiedades().get("aerolinea"));
+		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
+		vueloReqForm.setAerolineaCodigo(usuario.getPropiedades().get("aerolinea"));
 
 		String mensajeError = "";
 		GeneralResponseForm formResponse = null;
