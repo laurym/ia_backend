@@ -894,6 +894,9 @@ public class VueloController {
 				throw new ExceptionServiceGeneral(formResponse.getMensaje());
 			}
 			
+			if (vueloReqForm.getIsDisponible() != null)
+				vuelo.setDisponible(vueloReqForm.getIsDisponible());
+			
 			if (vueloReqForm.getDuracion() != null)
 				vuelo.setDuracion(Long.valueOf(vueloReqForm.getDuracion()));
 			
