@@ -520,7 +520,7 @@ public class VueloController {
 										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
 										@RequestParam(defaultValue = "0") int pagina,
 							            @RequestParam(defaultValue = "20") int cantidadPorPagina,
-										@RequestParam Map<String,String> vueloReqMap){//@RequestParam VueloReqForm vueloReqForm) {
+										@RequestParam Map<String,String> vueloReqMap){
 		LOG.info("***** Inicio  obtenerAeropuertos *****");
 		VueloResponseForm vueloResponseForm = new VueloResponseForm();
 		
@@ -746,7 +746,9 @@ public class VueloController {
 						
 						LocalDateTime today = travelDateFin.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 						LocalDateTime dateTime = today.plus(1, ChronoUnit.DAYS);
-						vueloReqForm.setFechaFin(formatter.format(new Date(dateTime.toString())));
+						
+						
+						vueloReqForm.setFechaFin(formatter.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant())));
 						
 					}
 					
@@ -765,7 +767,7 @@ public class VueloController {
 			
 			Page<Vuelo> vuelosPage = vueloService.buscarVuelosPageable(pagina, cantidadPorPagina, vueloReqForm.getAerolineaCodigo(), 
 												 vueloReqForm.getCodigoAeropuertoOrigen(), vueloReqForm.getCodigoAeropuertoDestino(),
-												 vueloReqForm.getFechaInicio());
+												 vueloReqForm.getFechaInicio(), vueloReqForm.getFechaFin());
 			Iterator<Vuelo> itObjs = vuelosPage.iterator();
 
 			while (itObjs.hasNext()) {

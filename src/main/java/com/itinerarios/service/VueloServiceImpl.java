@@ -97,9 +97,9 @@ public class VueloServiceImpl {
 	}
 	
 	public Page<Vuelo> buscarVuelosPageable(Integer page, Integer size,String aerolineaCodigo, String airportOrigin, String airportDest,
-			String date) throws ExceptionServiceGeneral {
+			String date, String dateFin) throws ExceptionServiceGeneral {
 
-		Iterable<Vuelo> vuelosIterable = this.buscarVuelosDisponibles(aerolineaCodigo, airportOrigin, airportDest, date);
+		Iterable<Vuelo> vuelosIterable = this.buscarVuelosDisponibles(aerolineaCodigo, airportOrigin, airportDest, date, dateFin);
 
 		List<Vuelo> result = new ArrayList<Vuelo>();
 		vuelosIterable.forEach(result::add);
@@ -109,7 +109,7 @@ public class VueloServiceImpl {
 
 	}
 	
-	public Iterable<Vuelo> buscarVuelosDisponibles(String aerolineaCodigo, String airportOrigin, String airportDest, String date) throws  ExceptionServiceGeneral{
+	public Iterable<Vuelo> buscarVuelosDisponibles(String aerolineaCodigo, String airportOrigin, String airportDest, String date, String dateFin) throws  ExceptionServiceGeneral{
 		String mensajeError=null;
 		Iterable<Vuelo> vuelos = null;
 		Long airportOrId = null;
@@ -151,7 +151,7 @@ public class VueloServiceImpl {
 			}
 			
 			Aerolinea aerolinea = getAerolineaRepository().find(aerolineaCodigo);
-			vuelos = getVueloRepository().buscarPorAerolineaAeropuertoAeropuertoDestinoFecha(airportOrId, airportDestId, aerolinea.getId(), date);
+			vuelos = getVueloRepository().buscarPorAerolineaAeropuertoAeropuertoDestinoFecha(airportOrId, airportDestId, aerolinea.getId(), date, dateFin);
 
 		} 
 		catch (QueryException e) {

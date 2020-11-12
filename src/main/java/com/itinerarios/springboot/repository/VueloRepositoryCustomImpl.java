@@ -3,6 +3,7 @@ package com.itinerarios.springboot.repository;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,7 +12,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
-import com.itinerarios.entity.Aeropuerto;
 import com.itinerarios.entity.ClaseVuelo;
 import com.itinerarios.entity.Vuelo;
 
@@ -33,7 +33,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 					    				+  " and vuelo.fechaPartida = :date "
 					    				+  " and claseVuelo.codigoClase.codigoClase = :tipoClase "
 					    				+  " and vuelo.disponible = :disponible "
-					    				+  " and claseVuelo.asientosClaseDisponibles >= :asientosClase "
+					    				+  " and claseVuelo.asientosClaseDisponibles  >= :asientosClase "
 					    				+  " order by vuelo.horaPartida asc";
 	    	Query query = entityManager.createQuery(consultaPorVuelos);
 	    	
@@ -83,7 +83,8 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 	    	query.setParameter("tipoClase", tipoClase);
 	    	query.setParameter("disponible", true);
 	    	LocalDate today = LocalDate.now();
-    	   	String formattedDate = today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+	    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    	   	String formattedDate = today.format(formatter);
 	    	query.setParameter("fecha", "\'"+formattedDate+"\'");
 	    	
 	    	query.setParameter("asientosClase", asientosDisponibles);
@@ -100,7 +101,8 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 						Set<ClaseVuelo> clases = new HashSet<ClaseVuelo>();
 						clases.add((ClaseVuelo) object);
 						vuelo.setClases(clases);
-						vuelosReturn.add(vuelo);
+						if ((LocalDate.parse(vuelo.getFechaPartida(), formatter)).compareTo(LocalDate.parse(formattedDate, formatter)) >0)
+							vuelosReturn.add(vuelo);
 					}
 				}
 			}
@@ -109,7 +111,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 			return vuelosReturn;
 		}
 	    
-	    public List<Vuelo> buscarPorAerolineaAeropuertoAeropuertoDestinoFecha(Long aeropuerto, Long aeropuertoDestino, Long aerolineaId, String date){
+	    public List<Vuelo> buscarPorAerolineaAeropuertoAeropuertoDestinoFecha(Long aeropuerto, Long aeropuertoDestino, Long aerolineaId, String date, String dateFin){
 	    	
 	    	String consultaPorVuelos = "from Vuelo as vuelo JOIN ClaseVuelo  as claseVuelo"
 	    			+ " on vuelo.codigo =  claseVuelo.codigoVuelo.codigo"
@@ -119,6 +121,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 					+  ((aeropuerto!=null)? " and vuelo.aeropuerto.id = :aeropuerto " :"")
 					+  ((aeropuertoDestino!=null)? " and vuelo.aeropuertoDestino.id = :aeropuertoDestino" : "")
 					+	" and vuelo.fechaPartida >=  :fecha "
+//					+   ((dateFin!=null)? " and vuelo.fechaPartida <= :fechaFin " : "")
     				+  " and vuelo.disponible = :disponible "
 //    				+  " and vuelo.asientosVendidos = 0 "
 					+ " ORDER by vuelo.fechaPartida asc, vuelo.horaPartida asc";
@@ -130,17 +133,26 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 			query.setParameter("aeropuertoDestino", aeropuertoDestino);	
 			query.setParameter("aerolineaId", aerolineaId);
 			query.setParameter("disponible", true);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			String formattedDate = "";
 			if(date== null || date.isEmpty()) {
 				LocalDate today = LocalDate.now();
-				String formattedDate = today.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+				formattedDate = today.format(formatter);
 				query.setParameter("fecha", "\'"+formattedDate+"\'");
 			} else {
-				query.setParameter("fecha", date);
+				formattedDate = date;
+				query.setParameter("fecha", "\'"+date+"\'");
 			}
 			
+//			if (dateFin != null)
+//				query.setParameter("fechaFin", "\'"+dateFin+"\'");
+//			
 			List<Object[]> vuelosBase  = query.getResultList();
 	    	List<Vuelo> vuelosReturn = new ArrayList<Vuelo>();
+	    	
 			for (Object[] value : vuelosBase) {
+				Boolean encontrado = Boolean.FALSE;
 				Vuelo vuelo = null;
 				for (Object object : value) {
 					if (object.getClass().equals(Vuelo.class)) {
@@ -150,12 +162,35 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 						Set<ClaseVuelo> clases = new HashSet<ClaseVuelo>();
 						clases.add((ClaseVuelo) object);
 						vuelo.setClases(clases);
-						vuelosReturn.add(vuelo);
+						
+						if (dateFin != null) {
+							if (((LocalDate.parse(vuelo.getFechaPartida(), formatter)).compareTo(LocalDate.parse(formattedDate, formatter)) >= 0)
+									&& ((LocalDate.parse(dateFin, formatter)).compareTo(LocalDate.parse(vuelo.getFechaPartida(), formatter)) > 0)) {
+									for (Vuelo vueloIdx :vuelosReturn) {
+										if(vueloIdx.getCodigo().compareTo(vuelo.getCodigo()) ==0) {
+											encontrado = Boolean.TRUE;
+											break;
+										}
+									}
+									if (!encontrado)
+										vuelosReturn.add(vuelo);
+							}
+						} else {
+							if ((LocalDate.parse(vuelo.getFechaPartida(), formatter)).compareTo(LocalDate.parse(formattedDate, formatter)) >= 0) {
+								for (Vuelo vueloIdx :vuelosReturn) {
+									if(vueloIdx.getCodigo().compareTo(vuelo.getCodigo()) ==0) {
+										encontrado = Boolean.TRUE;
+										break;
+									}
+								}
+								if (!encontrado)
+									vuelosReturn.add(vuelo);
+						}
 					}
 				}
 			}
 			
-
+			}
 	    	return vuelosReturn;
 	    }
 		
