@@ -202,18 +202,19 @@ public class VueloController {
 			throw new ExceptionServiceGeneral(mensajeError);
 		} else if (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.UNICO) == 0){
 			RecurrenciaVueloDTO recurrenciaDTO = vueloReqForm.getRecurrencia();
-			recurrenciaDTO.setCantidadRecurrencia(1L);
+//			recurrenciaDTO.setCantidadRecurrencia(1L);
 			vueloReqForm.setRecurrencia(recurrenciaDTO);
 			
 		} else if (vueloReqForm.getRecurrencia()==null){
 			RecurrenciaVueloDTO recurrenciaDTO = new RecurrenciaVueloDTO();
 			recurrenciaDTO.setTipoRecurrencia(TipoRecurrencia.UNICO);
-			recurrenciaDTO.setCantidadRecurrencia(1L);
+			recurrenciaDTO.setCantidadRecurrencia(0L);
 			
 			vueloReqForm.setRecurrencia(recurrenciaDTO);
 		}
+
 		String codigoRecurrente = null;
-		for (int i = 0; i < vueloReqForm.getRecurrencia().getCantidadRecurrencia(); i++) {
+		for (int i = 0; i <= vueloReqForm.getRecurrencia().getCantidadRecurrencia(); i++) {
 			VueloDTO vueloDTO = new VueloDTO();
 
 			vueloDTO.setCodigo(getCodigoVuelo(vueloReqForm, aerolineaDTO, i, codigoRecurrente));
@@ -363,7 +364,9 @@ public class VueloController {
 	public List<VueloDTO> obtenerVuelos(@RequestParam(name="codigoAeropuertoOrigen", required = true) String codigoAeropuertoOrigen,
 										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
 										@RequestParam Map<String,String> vueloReqMap){
+
 		LOG.info("***** Inicio  obtenerVuelos *****");
+
 		VueloResponseForm vueloResponseForm = new VueloResponseForm();
 		
 		
