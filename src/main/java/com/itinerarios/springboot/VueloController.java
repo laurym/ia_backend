@@ -362,8 +362,8 @@ public class VueloController {
 						 + " \n\n  Ejemplo : URLBASE/itinerarios/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
 	public List<VueloDTO> obtenerVuelos(@RequestParam(name="codigoAeropuertoOrigen", required = true) String codigoAeropuertoOrigen,
 										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
-										@RequestParam Map<String,String> vueloReqMap){//@RequestParam VueloReqForm vueloReqForm) {
-		LOG.info("***** Inicio  obtenerAeropuertos *****");
+										@RequestParam Map<String,String> vueloReqMap){
+		LOG.info("***** Inicio  obtenerVuelos *****");
 		VueloResponseForm vueloResponseForm = new VueloResponseForm();
 		
 		
@@ -474,7 +474,7 @@ public class VueloController {
 				listDTO.add(dto);
 			}
 
-			LOG.info("***** Fin  obtenerAeropuertos *****");
+			LOG.info("***** Fin  obtenerVuelos *****");
 			if (mensajeError == null || mensajeError.isEmpty())
 				mensajeError = "OK";
 			vueloResponseForm.setListVuelos(listDTO);
@@ -521,7 +521,7 @@ public class VueloController {
 										@RequestParam(defaultValue = "0") int pagina,
 							            @RequestParam(defaultValue = "20") int cantidadPorPagina,
 										@RequestParam Map<String,String> vueloReqMap){
-		LOG.info("***** Inicio  obtenerAeropuertos *****");
+		LOG.info("***** Inicio  obtenerVuelosV2 *****");
 		VueloResponseForm vueloResponseForm = new VueloResponseForm();
 		
 		
@@ -632,7 +632,7 @@ public class VueloController {
 			}
 
 			
-			LOG.info("***** Fin  obtenerAeropuertos *****");
+			LOG.info("***** Fin  obtenerVuelosV2 *****");
 			if (mensajeError == null || mensajeError.isEmpty())
 				mensajeError = "OK";
 			vueloResponseForm.setListVuelos(listDTO);
@@ -876,7 +876,7 @@ public class VueloController {
 			if (vueloReqForm.getFechaInicio()!=null)
 				 vuelo.setFechaPartida(vueloReqForm.getFechaInicio());
 			if(vueloReqForm.getHoraInicio()!=null)
-				vueloReqForm.setHoraInicio(vueloReqForm.getHoraInicio());
+				vuelo.setHoraPartida(vueloReqForm.getHoraInicio());
 			if(vueloReqForm.getIsDisponible()!=null) {
 				Boolean disponible = vueloReqForm.getIsDisponible().compareTo(Boolean.TRUE) ==0 ? Boolean.TRUE : (vueloReqForm.getIsDisponible().compareTo(Boolean.FALSE) ==0 ? Boolean.FALSE :null); 
 				if(disponible!= null)

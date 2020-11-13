@@ -33,7 +33,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 					    				+  " and vuelo.fechaPartida = :date "
 					    				+  " and claseVuelo.codigoClase.codigoClase = :tipoClase "
 					    				+  " and vuelo.disponible = :disponible "
-					    				+  " and claseVuelo.asientosClaseDisponibles  >= :asientosClase "
+					    				+  " and (claseVuelo.asientosClaseDisponibles - claseVuelo.asientosVendidos) >= :asientosClase "
 					    				+  " order by vuelo.horaPartida asc";
 	    	Query query = entityManager.createQuery(consultaPorVuelos);
 	    	
@@ -72,7 +72,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 									+  " WHERE vuelo.aeropuerto.id = :aeropuerto "
 									+  " and vuelo.aeropuertoDestino.id = :aeropuertoDestino"
 									+  " and claseVuelo.codigoClase.codigoClase = :tipoClase "
-				    				+  " and claseVuelo.asientosClaseDisponibles >= :asientosClase "
+				    				+  " and (claseVuelo.asientosClaseDisponibles - claseVuelo.asientosVendidos) >= :asientosClase "
 									+  " and vuelo.fechaPartida >=  :fecha "
 				    				+  " and vuelo.disponible = :disponible "
 									+ " ORDER by vuelo.fechaPartida asc, vuelo.horaPartida asc";
