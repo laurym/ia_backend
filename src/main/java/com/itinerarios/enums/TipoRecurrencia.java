@@ -1,7 +1,7 @@
 package com.itinerarios.enums;
 
 public enum TipoRecurrencia {
-	UNICO("UNA VEZ"), SEMANAL("SEMANAL"), MENSUAL("MENSUAL");
+	UNICO("UNICO"), SEMANAL("SEMANAL"), MENSUAL("MENSUAL");
 
 	private String valor;
 

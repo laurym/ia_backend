@@ -200,16 +200,21 @@ public class VueloController {
 						|| (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.SEMANAL) == 0 && vueloReqForm.getRecurrencia().getCantidadRecurrencia() > 52)))) {
 			mensajeError = "12 -  ****** RECURRENCIA ERROR ****** recurrencia con error";
 			throw new ExceptionServiceGeneral(mensajeError);
-		}
-		else if (vueloReqForm.getRecurrencia()==null){
+		} else if (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.UNICO) == 0){
+			RecurrenciaVueloDTO recurrenciaDTO = vueloReqForm.getRecurrencia();
+//			recurrenciaDTO.setCantidadRecurrencia(1L);
+			vueloReqForm.setRecurrencia(recurrenciaDTO);
+			
+		} else if (vueloReqForm.getRecurrencia()==null){
 			RecurrenciaVueloDTO recurrenciaDTO = new RecurrenciaVueloDTO();
 			recurrenciaDTO.setTipoRecurrencia(TipoRecurrencia.UNICO);
-			recurrenciaDTO.setCantidadRecurrencia(1L);
+			recurrenciaDTO.setCantidadRecurrencia(0L);
 			
 			vueloReqForm.setRecurrencia(recurrenciaDTO);
 		}
+
 		String codigoRecurrente = null;
-		for (int i = 0; i < vueloReqForm.getRecurrencia().getCantidadRecurrencia(); i++) {
+		for (int i = 0; i <= vueloReqForm.getRecurrencia().getCantidadRecurrencia(); i++) {
 			VueloDTO vueloDTO = new VueloDTO();
 
 			vueloDTO.setCodigo(getCodigoVuelo(vueloReqForm, aerolineaDTO, i, codigoRecurrente));
@@ -358,8 +363,10 @@ public class VueloController {
 						 + " \n\n  Ejemplo : URLBASE/itinerarios/rest/vuelos/busqueda?codigoAeropuertoDestino=EZE&codigoAeropuertoOrigen=FCO&codigoClase=C&fechaInicio=24/10/2020&cantidadPasajerosAdultos=2&cantidadPasajerosMenores=1")
 	public List<VueloDTO> obtenerVuelos(@RequestParam(name="codigoAeropuertoOrigen", required = true) String codigoAeropuertoOrigen,
 										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
-										@RequestParam Map<String,String> vueloReqMap){//@RequestParam VueloReqForm vueloReqForm) {
-		LOG.info("***** Inicio  obtenerAeropuertos *****");
+										@RequestParam Map<String,String> vueloReqMap){
+
+		LOG.info("***** Inicio  obtenerVuelos *****");
+
 		VueloResponseForm vueloResponseForm = new VueloResponseForm();
 		
 		
@@ -470,7 +477,7 @@ public class VueloController {
 				listDTO.add(dto);
 			}
 
-			LOG.info("***** Fin  obtenerAeropuertos *****");
+			LOG.info("***** Fin  obtenerVuelos *****");
 			if (mensajeError == null || mensajeError.isEmpty())
 				mensajeError = "OK";
 			vueloResponseForm.setListVuelos(listDTO);
@@ -516,8 +523,8 @@ public class VueloController {
 										@RequestParam(name="codigoAeropuertoDestino", required = true) String codigoAeropuertoDestino,
 										@RequestParam(defaultValue = "0") int pagina,
 							            @RequestParam(defaultValue = "20") int cantidadPorPagina,
-										@RequestParam Map<String,String> vueloReqMap){//@RequestParam VueloReqForm vueloReqForm) {
-		LOG.info("***** Inicio  obtenerAeropuertos *****");
+										@RequestParam Map<String,String> vueloReqMap){
+		LOG.info("***** Inicio  obtenerVuelosV2 *****");
 		VueloResponseForm vueloResponseForm = new VueloResponseForm();
 		
 		
@@ -628,7 +635,7 @@ public class VueloController {
 			}
 
 			
-			LOG.info("***** Fin  obtenerAeropuertos *****");
+			LOG.info("***** Fin  obtenerVuelosV2 *****");
 			if (mensajeError == null || mensajeError.isEmpty())
 				mensajeError = "OK";
 			vueloResponseForm.setListVuelos(listDTO);
@@ -695,19 +702,21 @@ public class VueloController {
 		String mensajeError = "";
 		SimpleDateFormat formatter = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA);
 
-		Date travelDate = null;
+		Date travelDateInicio = null;
+		Date travelDateFin = null;
 		List<VueloDTO> listDTO = new ArrayList<VueloDTO>();
 		try {
 				  vueloReqForm.setFechaInicio(vueloReqMap.get(ConstantsUtil.MAP_KEY_FECHA_INICIO));
+				  vueloReqForm.setFechaFin(vueloReqMap.get(ConstantsUtil.MAP_KEY_FECHA_FIN));
 				  vueloReqForm.setCodigoAeropuertoOrigen(vueloReqMap.get(ConstantsUtil.MAP_KEY_CODIGO_AEROPUERTO_ORIGEN));
 				  vueloReqForm.setCodigoAeropuertoDestino(vueloReqMap.get(ConstantsUtil.MAP_KEY_CODIGO_AEROPUERTO_DESTINO));
 				  
 			if (vueloReqForm.getFechaInicio() != null && !vueloReqForm.getFechaInicio().isEmpty()) {
 				try {
-					travelDate = formatter.parse(vueloReqForm.getFechaInicio());
+					travelDateInicio = formatter.parse(vueloReqForm.getFechaInicio());
 					ZoneId defaultZoneId = ZoneId.systemDefault();
 					Date fechaAComparar = Date.from((LocalDate.now().atStartOfDay(defaultZoneId)).toInstant());//.toInstant(offset)(defaultZoneId)//Instant.now());
-					if (fechaAComparar.compareTo(travelDate) >0) {
+					if (fechaAComparar.compareTo(travelDateInicio) >0) {
 						formResponse = new GeneralResponseForm("10 - ***** PARSE ERROR ***** La fecha tiene que ser mayor a la actual");
 						throw new ExceptionServiceGeneral(formResponse.getMensaje());
 					}
@@ -725,9 +734,43 @@ public class VueloController {
 				}
 			}
 			
+			if (vueloReqForm.getFechaFin() != null && !vueloReqForm.getFechaFin().isEmpty()) {
+				try {
+					travelDateFin = formatter.parse(vueloReqForm.getFechaFin());
+					ZoneId defaultZoneId = ZoneId.systemDefault();
+					Date fechaAComparar = Date.from((LocalDate.now().atStartOfDay(defaultZoneId)).toInstant());//.toInstant(offset)(defaultZoneId)//Instant.now());
+					if (fechaAComparar.compareTo(travelDateFin) >0) {
+						formResponse = new GeneralResponseForm("10 - ***** PARSE ERROR ***** La fecha tiene que ser mayor a la actual");
+						throw new ExceptionServiceGeneral(formResponse.getMensaje());
+					}
+					
+					if (travelDateInicio.compareTo(travelDateFin) ==0) {
+						
+						
+						LocalDateTime today = travelDateFin.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+						LocalDateTime dateTime = today.plus(1, ChronoUnit.DAYS);
+						
+						
+						vueloReqForm.setFechaFin(formatter.format(Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant())));
+						
+					}
+					
+				} catch (DateTimeParseException e) {
+					// Thrown if text could not be parsed in the specified format
+					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
+					throw new ExceptionServiceGeneral(mensajeError);
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					mensajeError = "01 - ***** PARSE ERROR ***** Fecha de inicio con error";
+					throw new ExceptionServiceGeneral(mensajeError);
+				}
+			}
+			
 			Page<Vuelo> vuelosPage = vueloService.buscarVuelosPageable(pagina, cantidadPorPagina, vueloReqForm.getAerolineaCodigo(), 
 												 vueloReqForm.getCodigoAeropuertoOrigen(), vueloReqForm.getCodigoAeropuertoDestino(),
-												 vueloReqForm.getFechaInicio());
+												 vueloReqForm.getFechaInicio(), vueloReqForm.getFechaFin());
 			Iterator<Vuelo> itObjs = vuelosPage.iterator();
 
 			while (itObjs.hasNext()) {
@@ -781,15 +824,15 @@ public class VueloController {
 				  		  + "}"
 						  + "\n\n	Se retorna el mensaje de OK ante una modificacion satisfactoria.")
 		
-	public GeneralResponseForm modificarVuelo(@RequestParam(name="codigoVuelo", required = true) String codigoVuelo,
-											  @RequestBody VueloReqModifForm vueloReqForm/*,
-											  @RequestHeader("token") String token*/
+	public GeneralResponseForm modificarVuelo(
+											  @RequestBody VueloReqModifForm vueloReqForm,
+											  @RequestHeader("token") String token
 											 ) throws JsonMappingException, JsonProcessingException, IOException {
 		
 		LOG.info("***** Inicio  modificarVuelo *****");
 		
-//		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
-		vueloReqForm.setAerolineaCodigo("LA");//usuario.getPropiedades().get("aerolinea"));
+		UsuarioReqInfoForm usuario = UsuarioUtils.getUsuario(token);
+		vueloReqForm.setAerolineaCodigo(usuario.getPropiedades().get("aerolinea"));
 
 		String mensajeError = "";
 		GeneralResponseForm formResponse = null;
@@ -836,7 +879,7 @@ public class VueloController {
 			if (vueloReqForm.getFechaInicio()!=null)
 				 vuelo.setFechaPartida(vueloReqForm.getFechaInicio());
 			if(vueloReqForm.getHoraInicio()!=null)
-				vueloReqForm.setHoraInicio(vueloReqForm.getHoraInicio());
+				vuelo.setHoraPartida(vueloReqForm.getHoraInicio());
 			if(vueloReqForm.getIsDisponible()!=null) {
 				Boolean disponible = vueloReqForm.getIsDisponible().compareTo(Boolean.TRUE) ==0 ? Boolean.TRUE : (vueloReqForm.getIsDisponible().compareTo(Boolean.FALSE) ==0 ? Boolean.FALSE :null); 
 				if(disponible!= null)
@@ -854,6 +897,9 @@ public class VueloController {
 				throw new ExceptionServiceGeneral(formResponse.getMensaje());
 			}
 			
+			if (vueloReqForm.getIsDisponible() != null)
+				vuelo.setDisponible(vueloReqForm.getIsDisponible());
+			
 			if (vueloReqForm.getDuracion() != null)
 				vuelo.setDuracion(Long.valueOf(vueloReqForm.getDuracion()));
 			
@@ -870,20 +916,53 @@ public class VueloController {
 	}
 	
 	@GetMapping("/busquedaPorCodigo")
-	@ApiOperation(value = "Método para realizar la búsqueda de vuelos por codigo.",
+	@ApiOperation(value = "Método para realizar la búsqueda de vuelos por código."
+						+ "	\n\n No se muestra info sobre precios si sobre el vuelo en si."
+						+ " \n\n Se agrego en el request el token",
 	 					 
-				notes= "\n\n A propositos de buscar el vuelo por el codigo.")
-	public VueloDTO buscarVuelosPorCodigoVuelo(String codigoVuelo){
-		Vuelo vuelos = this.vueloService.buscarVueloPorCodigo(codigoVuelo);
-		
-//		List<VueloDTO> vuelosDTO = new ArrayList<>();
-//		for(Vuelo idx : vuelos) {
-			VueloDTO vueloDTO = new VueloDTO();
-			vueloDTO = DTOUtils.convertToDto(vuelos);
-//			vuelosDTO.add(vueloDTO);
-//		}
-//		
-		return vueloDTO;
+				notes= "\n\n A propósitos de buscar el vuelo por el código.")
+	public VueloDTO buscarVuelosPorCodigoVuelo(@RequestParam(name = "codigoVuelo", required = true) String codigoVuelo,
+			@RequestHeader("token") String token) {
+
+		LOG.info("***** Inicio  buscarVuelosPorCodigoVuelo *****");
+		GeneralResponseForm formResponse = null;
+		String mensajeError = "";
+		VueloDTO vueloDTO = new VueloDTO();
+
+		if (!JWTUtils.verificarToken(token)) {
+			formResponse = new GeneralResponseForm("***** TOKEN ERROR ***** error al verificar token");
+			throw new ExceptionServiceGeneral(formResponse.getMensaje());
+		}
+		try {
+
+			Vuelo vuelo = this.vueloService.buscarVueloPorCodigo(codigoVuelo);
+
+			if (vuelo != null) {
+				vueloDTO = DTOUtils.convertToDto(vuelo);
+
+				SimpleDateFormat formatter2 = new SimpleDateFormat(ConstantsUtil.FORMAT_FECHA_CON_HORA);
+				Date fechaInicio = formatter2.parse(vueloDTO.getFechaPartida() + " " + vueloDTO.getHoraPartida());
+				Date fechaLlegada = new Date(fechaInicio.getTime() + vueloDTO.getDuracion() * ConstantsUtil.MULTIPLIER_MINUTE);
+
+				String date = formatter2.format(fechaLlegada);
+				String[] arrayDate = date.split(" ");
+
+				vueloDTO.setFechaLlegada(arrayDate[0]);
+				vueloDTO.setHoraLlegada(arrayDate[1]);
+			}
+			
+			LOG.info("***** Fin  buscarVuelosPorCodigoVuelo *****");
+
+			return vueloDTO;
+		} catch (RuntimeException e) {
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error. " + e.getMessage();
+			throw new ExceptionServiceGeneral(mensajeError);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error  " + e.getMessage();
+			throw new ExceptionServiceGeneral(mensajeError);
+		}
 	}
 	
 	

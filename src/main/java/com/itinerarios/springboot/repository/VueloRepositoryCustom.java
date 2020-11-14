@@ -15,6 +15,6 @@ public interface VueloRepositoryCustom {
 
 //	List<Vuelo> buscarPorCodigoAerolinea(String codigoAerolinea);
 	
-    public List<Vuelo> buscarPorAerolineaAeropuertoAeropuertoDestinoFecha(Long aeropuerto, Long aeropuertoDestino, Long aerolineaCodigo, String date);
+    public List<Vuelo> buscarPorAerolineaAeropuertoAeropuertoDestinoFecha(Long aeropuerto, Long aeropuertoDestino, Long aerolineaCodigo, String date, String dateFin);
 
 }
