@@ -165,7 +165,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 						
 						if (dateFin != null) {
 							if (((LocalDate.parse(vuelo.getFechaPartida(), formatter)).compareTo(LocalDate.parse(formattedDate, formatter)) >= 0)
-									&& ((LocalDate.parse(dateFin, formatter)).compareTo(LocalDate.parse(vuelo.getFechaPartida(), formatter)) > 0)) {
+									&& ((LocalDate.parse(dateFin, formatter)).compareTo(LocalDate.parse(vuelo.getFechaPartida(), formatter)) >= 0)) {
 									for (Vuelo vueloIdx :vuelosReturn) {
 										if(vueloIdx.getCodigo().compareTo(vuelo.getCodigo()) ==0) {
 											encontrado = Boolean.TRUE;
