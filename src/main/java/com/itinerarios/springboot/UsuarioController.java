@@ -102,4 +102,18 @@ public class UsuarioController {
 		
 		return usuarioResp;
 	}
+	
+	@GetMapping(value = "/refrescar", consumes = "application/json", produces = "application/json")
+	public String refrescarUsuario(@RequestHeader("token") String token) throws IOException {
+		
+		OkHttpClient client = new OkHttpClient().newBuilder().build();
+		
+		Request request = new Request.Builder().url("https://ssoia.herokuapp.com/JWT/refresh").method("GET",null)
+				.addHeader("x-api-key", ConstantsUtil.API_KEY)
+				.addHeader("Authorization",token.substring(7))
+				.addHeader("Content-Type", "application/json").build();
+		Response response = client.newCall(request).execute();
+		return response.body().string();
+
+	}
 }
