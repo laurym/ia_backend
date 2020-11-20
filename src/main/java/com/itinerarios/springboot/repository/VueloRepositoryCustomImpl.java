@@ -122,9 +122,9 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 					+  ((aeropuertoDestino!=null)? " and vuelo.aeropuertoDestino.id = :aeropuertoDestino" : "")
 					+	" and vuelo.fechaPartida >=  :fecha "
 //					+   ((dateFin!=null)? " and vuelo.fechaPartida <= :fechaFin " : "")
-    				+  " and vuelo.disponible = :disponible "
+    				+  " and vuelo.disponible = :disponible ";
 //    				+  " and vuelo.asientosVendidos = 0 "
-					+ " ORDER by vuelo.fechaPartida asc, vuelo.horaPartida asc";
+//					+  " ORDER by vuelo.fechaPartida asc";//, vuelo.horaPartida desc ";
 
 			Query query = entityManager.createQuery(consultaPorVuelos);
 			if (aeropuerto!=null)

@@ -1,5 +1,6 @@
 package com.itinerarios.dto;
 
+import java.util.Date;
 import java.util.Set;
 
 
@@ -15,6 +16,7 @@ public class VueloDTO {
 //		"disponible" (BOOLEAN)
 
 	private String codigo;
+	private Date fechaPartidaDTO;
 	private String fechaPartida;
 	private String horaPartida;
 	private String fechaLlegada;
@@ -37,6 +39,14 @@ public class VueloDTO {
 
 	public void setCodigo(String codigo) {
 		this.codigo = codigo;
+	}
+
+	public Date getFechaPartidaDTO() {
+		return fechaPartidaDTO;
+	}
+
+	public void setFechaPartidaDTO(Date fechaPartidaDTO) {
+		this.fechaPartidaDTO = fechaPartidaDTO;
 	}
 
 	public String getFechaPartida() {

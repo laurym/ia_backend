@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -57,6 +58,7 @@ import com.itinerarios.request.form.VueloReqForm;
 import com.itinerarios.request.form.VueloReqModifForm;
 import com.itinerarios.response.form.GeneralResponseForm;
 import com.itinerarios.response.form.VueloResponseForm;
+import com.itinerarios.service.SortByFecha;
 import com.itinerarios.service.VueloServiceImpl;
 import com.itinerarios.springboot.utils.ConstantsUtil;
 import com.itinerarios.springboot.utils.DTOUtils;
@@ -468,6 +470,7 @@ public class VueloController {
 				Date fechaInicio = formatter2.parse(dto.getFechaPartida() + " " + dto.getHoraPartida());
 				Date fechaLlegada = new Date (fechaInicio.getTime() + vuelo.getDuracion() * ConstantsUtil.MULTIPLIER_MINUTE);
 				
+				dto.setFechaPartidaDTO(fechaInicio);
 				String date = formatter2.format(fechaLlegada);
 				String [] arrayDate = date.split(" ");
 				
@@ -480,6 +483,8 @@ public class VueloController {
 			LOG.info("***** Fin  obtenerVuelos *****");
 			if (mensajeError == null || mensajeError.isEmpty())
 				mensajeError = "OK";
+			Collections.sort(listDTO, new SortByFecha());
+
 			vueloResponseForm.setListVuelos(listDTO);
 
 //			vueloResponseForm.setMensaje(new GeneralResponseForm(mensajeError));
@@ -625,6 +630,7 @@ public class VueloController {
 				Date fechaInicio = formatter2.parse(dto.getFechaPartida() + " " + dto.getHoraPartida());
 				Date fechaLlegada = new Date (fechaInicio.getTime() + vuelo.getDuracion() * ConstantsUtil.MULTIPLIER_MINUTE);
 				
+				dto.setFechaPartidaDTO(fechaInicio);
 				String date = formatter2.format(fechaLlegada);
 				String [] arrayDate = date.split(" ");
 				
@@ -638,6 +644,9 @@ public class VueloController {
 			LOG.info("***** Fin  obtenerVuelosV2 *****");
 			if (mensajeError == null || mensajeError.isEmpty())
 				mensajeError = "OK";
+			
+			Collections.sort(listDTO, new SortByFecha());
+
 			vueloResponseForm.setListVuelos(listDTO);
 
         	
@@ -771,6 +780,8 @@ public class VueloController {
 			Page<Vuelo> vuelosPage = vueloService.buscarVuelosPageable(pagina, cantidadPorPagina, vueloReqForm.getAerolineaCodigo(), 
 												 vueloReqForm.getCodigoAeropuertoOrigen(), vueloReqForm.getCodigoAeropuertoDestino(),
 												 vueloReqForm.getFechaInicio(), vueloReqForm.getFechaFin());
+			
+			
 			Iterator<Vuelo> itObjs = vuelosPage.iterator();
 
 			while (itObjs.hasNext()) {
@@ -781,6 +792,7 @@ public class VueloController {
 				Date fechaInicio = formatter2.parse(dto.getFechaPartida() + " " + dto.getHoraPartida());
 				Date fechaLlegada = new Date (fechaInicio.getTime() + vuelo.getDuracion() * ConstantsUtil.MULTIPLIER_MINUTE);
 				
+				dto.setFechaPartidaDTO(fechaInicio);
 				String date = formatter2.format(fechaLlegada);
 				String [] arrayDate = date.split(" ");
 				
@@ -789,6 +801,7 @@ public class VueloController {
 				
 				listDTO.add(dto);
 			}
+			Collections.sort(listDTO, new SortByFecha());
 			
 			LOG.info("***** Fin  busquedaMod *****");
 			if (mensajeError == null || mensajeError.isEmpty())
