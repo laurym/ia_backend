@@ -129,19 +129,6 @@ public class VueloServiceImpl {
 					Aeropuerto destino = buscarPorAcronimo(airportDest.toUpperCase());
 					airportOrId = origen.getId();
 					airportDestId = destino.getId();
-//				if (date == null || date.isEmpty() && tipoClase ==null || tipoClase.isEmpty())
-//					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestino(origin.getId(), destination.getId(), asientosDisponibles);
-
-//				else 
-//					if ((date != null || !date.isEmpty()) && (tipoClase ==null  || tipoClase.isEmpty()))
-//					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoFecha(origin.getId(), destination.getId(), asientosDisponibles , date);
-
-//				else
-//				if ((date == null || date.isEmpty()) && (tipoClase != null && !tipoClase.isEmpty()))
-//					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoClase(origin.getId(),
-//							destination.getId(), asientosDisponibles, tipoClase);
-//
-//				else
 
 				}	else {
 					mensajeError = "05 -  ****** SYSTEM ERROR ****** búsqueda con error - "
@@ -176,14 +163,6 @@ public class VueloServiceImpl {
 			if (!airportOrigin.toUpperCase().equals(airportDest.toUpperCase())) {
 				Aeropuerto origin = buscarPorAcronimo(airportOrigin.toUpperCase());
 				Aeropuerto destination = buscarPorAcronimo(airportDest.toUpperCase());
-//				if (date == null || date.isEmpty() && tipoClase ==null || tipoClase.isEmpty())
-//					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestino(origin.getId(), destination.getId(), asientosDisponibles);
-				
-//				else 
-//					if ((date != null || !date.isEmpty()) && (tipoClase ==null  || tipoClase.isEmpty()))
-//					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoFecha(origin.getId(), destination.getId(), asientosDisponibles , date);
-				
-//				else
 				if ((date == null || date.isEmpty()) && (tipoClase != null && !tipoClase.isEmpty()))
 					vuelos = getVueloRepository().buscarPorAeropuertoAeropuertoDestinoClase(origin.getId(),
 							destination.getId(), asientosDisponibles, tipoClase);

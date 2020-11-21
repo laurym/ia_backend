@@ -204,7 +204,6 @@ public class VueloController {
 			throw new ExceptionServiceGeneral(mensajeError);
 		} else if (vueloReqForm.getRecurrencia().getTipoRecurrencia().compareTo(TipoRecurrencia.UNICO) == 0){
 			RecurrenciaVueloDTO recurrenciaDTO = vueloReqForm.getRecurrencia();
-//			recurrenciaDTO.setCantidadRecurrencia(1L);
 			vueloReqForm.setRecurrencia(recurrenciaDTO);
 			
 		} else if (vueloReqForm.getRecurrencia()==null){
@@ -242,7 +241,7 @@ public class VueloController {
 			
 			
 			vueloDTO.setDuracion(Long.valueOf(vueloReqForm.getDuracion()));
-			vueloDTO.setDisponible(Boolean.TRUE);// vueloReqForm.getIsDisponible());
+			vueloDTO.setDisponible(Boolean.TRUE);
 			Set<ClaseVueloFormDTO> vuelosSet = new HashSet<ClaseVueloFormDTO>(vueloReqForm.getClasesPorVueloList());
 			Set<ClaseVueloDTO> setVuelosDTO = new HashSet<ClaseVueloDTO>();
 
@@ -487,7 +486,6 @@ public class VueloController {
 
 			vueloResponseForm.setListVuelos(listDTO);
 
-//			vueloResponseForm.setMensaje(new GeneralResponseForm(mensajeError));
 			return listDTO;
 		} catch (RuntimeException e) {
 			mensajeError = "13 - ***** BUSQUEDA ERROR ***** Sistema error. " + e.getMessage();
@@ -978,31 +976,6 @@ public class VueloController {
 		}
 	}
 	
-	
-//	@GetMapping("/paises")
-    public List<VueloDTO> paginas(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "30") int size,
-            @RequestParam(defaultValue = "fechaPartida") String order,
-            @RequestParam(defaultValue = "true") boolean asc
-    ){
-        Page<Vuelo> vuelos = vueloService.paginas(PageRequest.of(page, size, Sort.by(order)));
-        if(!asc)
-            vuelos = vueloService.paginas(PageRequest.of(page, size, Sort.by(order).descending()));
-        
-        	Iterator<Vuelo> itVuelos = vuelos.iterator();
-        	List<VueloDTO> vuelosDTOList = new ArrayList<>();
-        	
-        	while (itVuelos.hasNext()) {
-        		Vuelo vuelo = itVuelos.next();
-        		VueloDTO vueloDTO = DTOUtils.convertToDto(vuelo);
-        		vuelosDTOList.add(vueloDTO);
-        	}
-//        	        return new PageImpl<Patient>(patientsList.subList(start, end), new PageRequest(page, size), patientsList.size());
-        	Pageable paging = PageRequest.of(page, size);
-        	Page<VueloDTO> vuelosReturn = new PageImpl<VueloDTO>(vuelosDTOList , paging , vuelos.getTotalElements());
-        	return vuelosReturn.toList();//, HttpStatus.OK);
-    }
 	
 	private Long getRandomNumberLongs(Long min, Long max) {
 		Random random = new Random();

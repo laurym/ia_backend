@@ -21,9 +21,6 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 	    private EntityManager entityManager;
 	 
 	    @Override
-//		@Query("select v from Vuelo v where v.aeropuerto.id = :aeropuerto and 
-//	    v.aeropuertoDestino.id = :aeropuertoDestino and v.fechaPartida= :date
-//	    and v.clases.codigoClase = :tipoClase order by v.horaPartida asc")
 
 	    public List<Vuelo> buscarPorAeropuertoAeropuertoDestinoFechaClase(Long aeropuerto, Long aeropuertoDestino, Long asientosDisponibles, String date, String tipoClase){
 	    	String consultaPorVuelos = "from Vuelo as vuelo JOIN ClaseVuelo  as claseVuelo"
@@ -60,7 +57,6 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 					}
 				}
 			}
-//	    	vuelosReturn.forEach(v -> System.out.println(v.getCodigo()));
 
 	    	return vuelosReturn;
 	    }
@@ -121,10 +117,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 					+  ((aeropuerto!=null)? " and vuelo.aeropuerto.id = :aeropuerto " :"")
 					+  ((aeropuertoDestino!=null)? " and vuelo.aeropuertoDestino.id = :aeropuertoDestino" : "")
 					+	" and vuelo.fechaPartida >=  :fecha "
-//					+   ((dateFin!=null)? " and vuelo.fechaPartida <= :fechaFin " : "")
     				+  " and vuelo.disponible = :disponible ";
-//    				+  " and vuelo.asientosVendidos = 0 "
-//					+  " ORDER by vuelo.fechaPartida asc";//, vuelo.horaPartida desc ";
 
 			Query query = entityManager.createQuery(consultaPorVuelos);
 			if (aeropuerto!=null)
@@ -144,10 +137,7 @@ public class VueloRepositoryCustomImpl implements VueloRepositoryCustom{
 				formattedDate = date;
 				query.setParameter("fecha", "\'"+date+"\'");
 			}
-			
-//			if (dateFin != null)
-//				query.setParameter("fechaFin", "\'"+dateFin+"\'");
-//			
+
 			List<Object[]> vuelosBase  = query.getResultList();
 	    	List<Vuelo> vuelosReturn = new ArrayList<Vuelo>();
 	    	
